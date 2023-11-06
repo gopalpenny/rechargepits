@@ -4,7 +4,7 @@
 \alias{get_greenampt_x_roots}
 \title{Get green ampt roots}
 \usage{
-get_greenampt_x_roots(times, x_units, green_ampt_function, ...)
+get_greenampt_x_roots(times, x_units, green_ampt_function_name, ...)
 }
 \description{
 Get green ampt roots
@@ -18,6 +18,9 @@ Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- get_greenampt_horiz_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
-Fcum <- get_greenampt_x_roots(times = set_units(1:10, "min"), x_units = "mm", green_ampt_function = get_greenampt_horiz_time,
+times <- set_units(1:60, "min")
+Fcum_horiz <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_horiz_time",
+   VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
+Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
    VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 }

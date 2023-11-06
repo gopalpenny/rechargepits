@@ -89,4 +89,49 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 }
 
 
+#' Horizontal Green-Ampt flow time
+#'
+#'
+#' @inheritParams get_greenampt_time
+#' @export
+#' @description
+#' This function models saturated horizontal flow from a saturated
+#' surface into a soil profile. The assumptions are the same as
+#' in the Green-Ampt equation, except that there is no effect of
+#' gravity because all flow is assumed to be horizontal. The function
+#' further integrates over the vertical depth of a pit such that
+#' the hydraulic head at the boundary goes from 0 to h_d.
+#' The equation is:
+#'
+#' $$F^2$$
+#' $$F^2$$
+#' $$F^2$$
+#' @returns Returns the time at which a cumulative amount of
+#' infiltration occurs.
+#' @examples
+#'
+#' library(units)
+#' VWC_0 <- 0.2 # unitless
+#' n <- 0.35 # unitless
+#' Fcum <- set_units(20, "mm") # depth
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"))
+get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t) {
+
+  dVWC = n - VWC_0
+  # h_diff <- h_b - h_0
+
+  Ksat2 <- Ksat * set_units(1, units(Ksat)$numerator)
+  h_b2 <- h_b * set_units(1, units(h_b)$numerator)
+  h_02 <- h_0 * set_units(1, units(h_0)$numerator)
+
+  Fv2 <- sqrt(8/9 * dVWC * Ksat2 * t) * ((h_b2 - h_02)^(3/2) - (-h_02)^(3/2))
+  Fv <- Fv2 / set_units(1, units(h_b)$numerator) / set_units(1, units(Ksat)$numerator)
+
+  return(Fv)
+}
+
+
 

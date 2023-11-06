@@ -11,11 +11,13 @@
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- get_greenampt_horiz_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
-#' times <- set_units(1:10, "min")
-#' Fcum <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_horiz_time",
+#' times <- set_units(1:60, "min")
+#' Fcum_horiz <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_horiz_time",
+#'    VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
+#' Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
 #'    VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...) {
-  abc <- 100
+
   units::units_options(set_units_mode = "standard")
 
   for (i in 1:length(times)) {
@@ -24,8 +26,8 @@ get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...)
 
     green_ampt_function_i <- function(x) {
       x <- set_units(x, x_units)
-      if (green_ampt_function_name=="get_greenampt_horiz_time") {
-        time_root <- get_greenampt_horiz_time(Fcum = x, ...) - time
+      if (green_ampt_function_name=="get_greenampt_time") {
+        time_root <- get_greenampt_time(Fcum = x, ...) - time
       } else if (green_ampt_function_name=="get_greenampt_horiz_time") {
         time_root <- get_greenampt_horiz_time(Fcum = x, ...) - time
       } else {
