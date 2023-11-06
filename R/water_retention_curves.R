@@ -60,10 +60,11 @@ get_vg_hydraulic_head <- function(theta, theta_r, theta_s, alpha, n) {
 #' hydraulic_head <- get_bc_hydraulic_head(theta, theta_r, theta_s, h_d, lambda)
 #'
 #' library(tidyr)
-#' thetas <- data.frame(theta = seq(0.05, max(rawls_soils$porosity), length.out = 100)
-#' df <- crossing(rawls_soils, thetas)
+#' rel_theta <- data.frame(rel_theta = seq(0.01, 1, length.out = 100))
+#' df <- crossing(rawls_soils, rel_theta)
+#' df$theta <- df$rel_theta * (df$porosity - df$theta_r) + df$theta_r
 #' df$hydraulic_head <- get_bc_hydraulic_head(
-#'   theta = df$theta,
+#'   theta = theta,
 #'   theta_r = df$theta_r,
 #'   theta_s = df$porosity,
 #'   h_d = set_units(df$bubbling_pressure_arithmetic_cm, "cm"),
@@ -72,8 +73,9 @@ get_vg_hydraulic_head <- function(theta, theta_r, theta_s, alpha, n) {
 #'
 #' library(ggplot2)
 #' ggplot(df) +
-#'   geom_line(aes(theta, hydraulic_head_cm, color = texture_class)) +
-#'   ylim(c(-1000, 0))
+#'   geom_line(aes(theta, hydraulic_head_cm, color = texture_class, linetype = texture_class)) +
+#'   ylim(c(-1000, 0)) +
+#'   scale_linetype_manual(values = rep(c("solid","dashed","dotted"),4))
 get_bc_hydraulic_head <- function(theta, theta_r, theta_s, h_d, lambda) {
   S <- (theta - theta_r) / (theta_s - theta_r)
 
@@ -81,7 +83,6 @@ get_bc_hydraulic_head <- function(theta, theta_r, theta_s, h_d, lambda) {
 
   h <- -h_d * S^(-1/lambda)
   h_units <- units(h_d)$numerator
-  h <- replace(h, theta >= theta_s, units::set_units(0, units(h_d))) # adjust for saturated soils
   h <- replace(h, theta >= theta_s, units::set_units(0, units(h_d))) # adjust for saturated soils
 
   return(h)

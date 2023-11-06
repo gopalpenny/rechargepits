@@ -43,7 +43,7 @@ $$t = 1/Ksat * (Fcum - (n - VWC_0)(h_b - h_0) * ln(1 + Fcum / ((n - VWC_0)(h_b -
 library(units)
 VWC_0 <- 0.2 # unitless
 n <- 0.35 # unitless
-Fcum <- set_units(20, "mm") # depth
+Fcum <- set_units(1:20, "mm") # depth
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)

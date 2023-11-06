@@ -19,4 +19,5 @@ Returns soil properties from Rawls et al (1982)
 
 print(rawls_soils$texture_class)
 sand_rawls <- get_rawls_soil(soil_name = "Sandy loam")
+get_rawls_soil(soil_name = c("Sand","Sandy loam"))
 }

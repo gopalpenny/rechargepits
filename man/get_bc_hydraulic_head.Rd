@@ -31,10 +31,28 @@ curves in a degraded alpine meadow region. Scientific Reports, 9(1), 18407.
 library(units)
 
 sand_rawls <- get_rawls_soil(soil_name = "Sandy loam")
-theta <- seq(theta_r, sand_rawls$porosity, by = 0.01)
+theta <- seq(0.15, sand_rawls$porosity, length.out = 100)
 theta_r <- sand_rawls$theta_r
 theta_s <- sand_rawls$porosity
 h_d <- set_units(sand_rawls$bubbling_pressure_arithmetic_cm, "cm") # should have units of length
 lambda <- sand_rawls$pore_size_distrib_arithmetic
-get_bc_hydraulic_head(theta, theta_r, theta_s, h_d, lambda)
+hydraulic_head <- get_bc_hydraulic_head(theta, theta_r, theta_s, h_d, lambda)
+
+library(tidyr)
+rel_theta <- data.frame(rel_theta = seq(0.01, 1, length.out = 100))
+df <- crossing(rawls_soils, rel_theta)
+df$theta <- df$rel_theta * (df$porosity - df$theta_r) + df$theta_r
+df$hydraulic_head <- get_bc_hydraulic_head(
+  theta = theta,
+  theta_r = df$theta_r,
+  theta_s = df$porosity,
+  h_d = set_units(df$bubbling_pressure_arithmetic_cm, "cm"),
+  lambda = df$pore_size_distrib_arithmetic)
+df$hydraulic_head_cm <- as.numeric(df$hydraulic_head)
+
+library(ggplot2)
+ggplot(df) +
+  geom_line(aes(theta, hydraulic_head_cm, color = texture_class, linetype = texture_class)) +
+  ylim(c(-1000, 0)) +
+  scale_linetype_manual(values = rep(c("solid","dashed","dotted"),4))
 }
