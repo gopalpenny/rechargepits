@@ -1,0 +1,50 @@
+---
+title: "recharge-pit-geometries"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{recharge-pit-geometries}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+This packages provides an analytical method to estimate the recharge from subsurface pits. Each method provided offers a simplified geometry of the pit and/or the recharge behavior in order to make the mathematics more tractable. The basic assumptions about flow within each of the models are those assumptions made by the Green-Ampt method:
+
+1. Homogeneous soil with initial water content (VWC_0)
+2. Constant pressure head (h_0) at the wetting front
+3. Saturated soil above above wetting front
+4. Continuous supply of water with constant head (h_b) at the soil surface boundary
+
+With respect to the pits, further assumptions are made as described below.
+
+## Rectangular pit with perpendicular flow
+
+In this case, the pit is represented as a rectangular volume with a length, width, and depth. All flow occurs perpendicular to the pit. Therefore the calculated recharge underestimates the actual recharge because this approach fails to account for (e.g.) diagonal flow away from the corners of the pit, which may represent considerable flow.
+
+```{r include = FALSE}
+library(ggplot2) 
+library(dplyr)
+library(patchwork)
+rect_base <- data.frame(x = c(-0.5, 0.5, 0.5, -0.5), y = c(-0.5, -0.5, 0.5, 0.5))
+arrow_base <- data.frame(x = c(-0.5, 0, 0.5, 0), 
+                            y = c(0, -0.5, 0, 0.5))
+top_df_arrows <- arrow_base %>%
+  mutate(xend = x*1.5, yend = y*1.5)
+bottom_df_arrows <- arrow_base %>% 
+  mutate(y = y*1.5,
+         xend = x*1.5,
+         yend = y + 0.25 * sign(y)) %>% filter(y <= 0)
+bottom_df <- rect_base %>% mutate(y = y*1.5)
+p_top <- ggplot() + 
+  geom_polygon(data = rect_base, aes(x, y), color = "black", fill = NA) +
+  geom_segment(data = top_df_arrows, aes(x, y, xend = xend, yend = yend), arrow = grid::arrow(length = unit(0.5, "cm")))  +
+  coord_equal()
+
+p_side <- ggplot() +
+  geom_polygon(data = bottom_df, aes(x, y - 0.75), color = "black", fill = NA) +
+  geom_segment(data = bottom_df_arrows, aes(x, y - 0.75, xend = xend, yend = yend - 0.75), arrow = grid::arrow(length = unit(0.5, "cm"))) +
+  ylab("z") + xlab("x") +
+  coord_equal()
+
+# p_top / p_side
+```

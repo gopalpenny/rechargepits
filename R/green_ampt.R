@@ -204,28 +204,42 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' library(units)
 #' VWC_0 <- 0.2 # unitless
 #' n <- 0.35 # unitless
-#' Fcum <- set_units(20, "mm") # depth
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"))
-#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), thickness = set_units(1, "ft"))
-get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, thickness = NULL) {
+#'
+#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+#'
+#' # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
+#' Fv_dv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+#' Fv_point <- Fv_dv/ set_units(1, "mm")
+#' Fv_point
+#' # Get the point infiltration
+#' F_point <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr")) %>% set_units("mm")
+#' F_point
+#' # percent error:
+#' (Fv_point - F_point) / F_point * 100
+get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d = NULL) {
 
-  if (is.null(thickness)) {
-    thickness <- h_b
+  if (is.null(d)) {
+    d <- h_b
   }
 
-  dVWC = n - VWC_0
+  units_obj <- d^2
+
+  dVWC <- n - VWC_0
   # h_diff <- h_b - h_0
 
-  Ksat2 <- Ksat * set_units(1, units(Ksat)$numerator)
-  h_b_bottom2 <- h_b * set_units(1, units(h_b)$numerator)
-  h_b_top2 <- h_b * set_units(1, units(h_b)$numerator) - thickness * set_units(1, units(thickness)$numerator)
-  h_02 <- h_0 * set_units(1, units(h_0)$numerator)
+  t_num <- as.numeric(set_units(t, "h"))
 
-  Fv2 <- sqrt(8/9 * dVWC * Ksat2 * t) * ((h_b_bottom2 - h_02)^(3/2) - (h_b_top2-h_02)^(3/2))
-  Fv <- Fv2 / set_units(1, units(h_b)$numerator) / set_units(1, units(Ksat)$numerator)
+  Ksat_num <- as.numeric(set_units(Ksat, "cm/h"))
+  h_b_bottom_num <- as.numeric(set_units(h_b, "cm"))
+  h_b_top_num <- as.numeric(set_units(h_b, "cm") - set_units(d, "cm"))
+  h_0_num <- as.numeric(set_units(h_0, "cm"))
+
+  Fv_num <- sqrt(8/9 * dVWC * Ksat_num * t_num) * ((h_b_bottom_num - h_0_num)^(3/2) - (h_b_top_num-h_0_num)^(3/2))
+  Fv_cm2 <- set_units(Fv_num, "cm^2")
+  Fv <- set_units(Fv_cm2, units(units_obj))
 
   return(Fv)
 }

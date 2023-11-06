@@ -2,6 +2,7 @@
 
 export(get_bc_hydraulic_head)
 export(get_greenampt_flow_numerical)
+export(get_greenampt_horiz_flow)
 export(get_greenampt_horiz_flow_integrated)
 export(get_greenampt_horiz_time)
 export(get_greenampt_time)
