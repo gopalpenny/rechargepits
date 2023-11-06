@@ -29,7 +29,7 @@ This packages provides analytical and root-finding methods for calculating groun
 
 The building blocks of the pit recharge calculations are analytical equations simulating the specific infiltration scenarios described below. 
 
-### Vertical flow: Green-Ampt equation
+## Vertical flow: Green-Ampt equation
 
 To derive the Green-Ampt equation, we need to combine the following equations. First, Darcy flow:
 
@@ -91,7 +91,9 @@ ggplot(df) +
   scale_shape_manual(values = c(1, 3))
 ```
 
-### Horizontal flow: Green-Ampt without gravity
+## Horizontal flow: Green-Ampt without gravity
+
+### Horizontal parallel flow
 
 This scenario is similar to Green-Ampt except that the flow occurs horizontally through a vertical surface. Darcy flow in this case can be calculated as:
 $$
@@ -133,7 +135,7 @@ ggplot(df) +
 
 ```
 
-### Horizontal flow integrated over a depth
+### Horizontal parallel flow integrated over a depth
 
 Now we'd like to have a single equation to calculate the horizontal infiltration over a vertical surface, which we refer to as $F_v$, while noting that $\Delta F_v = F \Delta z$. Therefore we need to integrate, noting that we now use $h_p(z)$ to indicate the pressure head in the pit:
 
@@ -150,3 +152,40 @@ Integrating the right side we end up with:
 $$
 F_v = \sqrt{\frac{8}{9} \Delta \theta K_{sat} t} \Big[(h_b - h_0)^{3/2} - (h_b - d - h_0)^{3/2} \Big]
 $$
+
+This equation is implemented with `get_greenampt_horiz_flow_integrated`. 
+
+```{r}
+library(units)
+VWC_0 <- 0.2 # unitless
+n <- 0.35 # unitless
+Ksat <- set_units(0.2, "cm/h") # length / time
+h_b <- set_units(6, "ft") # hydraulic head (length)
+h_0 <- set_units(-10, "cm") # hydraulic head (length)
+
+Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+```
+
+To demonstrate this works, we can compare the point flow with the integrated flow over a differential depth (e.g., 1 mm):
+
+```{r}
+# Get the infiltration over a 1 mm differential depth to compare with the point infiltration
+Fv_dv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+Fv_point <- Fv_dv/ set_units(1, "mm")
+Fv_point
+
+# Get the point infiltration
+F_point <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr")) 
+F_point <- set_units(F_point, "mm")
+F_point
+# percent error: (Fv_point - F_point) / F_point * 100
+```
+
+The percent error is `r round((Fv_point - F_point) / F_point * 100, 3)`\%. 
+
+### Horizontal flow through a cylinder
+
+To come soon.
+
+## Spherical flow without gravity
+

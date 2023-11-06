@@ -221,6 +221,8 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' (Fv_point - F_point) / F_point * 100
 get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d = NULL) {
 
+  units::units_options(set_units_mode = "standard")
+
   if (is.null(d)) {
     d <- h_b
   }
