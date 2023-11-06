@@ -2,7 +2,7 @@
 % Please edit documentation in R/pit_recharge.R
 \name{get_greenampt_time}
 \alias{get_greenampt_time}
-\title{Horizontal Green-Ampt flow time}
+\title{Green-Ampt flow time}
 \usage{
 get_greenampt_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
 }
@@ -24,22 +24,28 @@ Returns the time at which a cumulative amount of
 infiltration occurs.
 }
 \description{
-This function models saturated horizontal flow from a saturated
-surface into a soil profile. The assumptions are the same as
-in the Green-Ampt equation, except that there is no effect of
-gravity because all flow is assumed to be horizontal. The equation is:
+This function models the Green-Ampt equation, with a saturated
+surface flowing vertically downward into a soil profile. The
+assumptions are:
 
-$$F^2$$
-$$F^2$$
-$$F^2$$
+1. Homogeneous soil with initial water content (VWC_0)
+2. Constant pressure head (h_0) at the wetting front
+3. Saturated soil above above wetting front
+4. Continuous supply of water with constant head (h_b) at the soil surface boundary
+
+With these assumptions, the amount of time for a particular infiltration depth (Fcum)
+can be calculated using Darcy's law as:
+
+$$t = 1/Ksat * (Fcum - (n - VWC_0)(h_b - h_0) * ln(1 + Fcum / ((n - VWC_0)(h_b - h_))))$
 }
 \examples{
 
-VWC_0 <- 0.2
-n <- 0.35
-Fcum <- 20 # mm
-Ksat <- 5 # UNITS??
-h_b <- 6
-h_0 <- -20
+library(units)
+VWC_0 <- 0.2 # unitless
+n <- 0.35 # unitless
+Fcum <- set_units(20, "mm") # depth
+Ksat <- set_units(0.2, "cm/h") # length / time
+h_b <- set_units(6, "ft") # hydraulic head (length)
+h_0 <- set_units(-10, "cm") # hydraulic head (length)
 get_greenampt_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
 }
