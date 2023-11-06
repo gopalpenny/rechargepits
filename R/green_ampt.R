@@ -141,6 +141,7 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #'
 #'
 #' @inheritParams get_greenampt_time
+#' @param thickness Depth over which to be integrated. If NULL, set to h_b
 #' @export
 #' @description
 #' This function models saturated horizontal flow from a saturated
@@ -148,7 +149,7 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' in the Green-Ampt equation, except that there is no effect of
 #' gravity because all flow is assumed to be horizontal. The function
 #' further integrates over the vertical depth of a pit such that
-#' the hydraulic head at the boundary goes from 0 to h_d.
+#' the hydraulic head at the boundary goes from (h_b - thickness) to h_b.
 #' The equation is:
 #'
 #' $$F^2$$
@@ -166,16 +167,22 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"))
-get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t) {
+#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), thickness = set_units(1, "ft"))
+get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, thickness = NULL) {
+
+  if (is.null(thickness)) {
+    thickness <- h_b
+  }
 
   dVWC = n - VWC_0
   # h_diff <- h_b - h_0
 
   Ksat2 <- Ksat * set_units(1, units(Ksat)$numerator)
-  h_b2 <- h_b * set_units(1, units(h_b)$numerator)
+  h_b_bottom2 <- h_b * set_units(1, units(h_b)$numerator)
+  h_b_top2 <- h_b * set_units(1, units(h_b)$numerator) - thickness * set_units(1, units(thickness)$numerator)
   h_02 <- h_0 * set_units(1, units(h_0)$numerator)
 
-  Fv2 <- sqrt(8/9 * dVWC * Ksat2 * t) * ((h_b2 - h_02)^(3/2) - (-h_02)^(3/2))
+  Fv2 <- sqrt(8/9 * dVWC * Ksat2 * t) * ((h_b_bottom2 - h_02)^(3/2) - (h_b_top2-h_02)^(3/2))
   Fv <- Fv2 / set_units(1, units(h_b)$numerator) / set_units(1, units(Ksat)$numerator)
 
   return(Fv)

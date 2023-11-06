@@ -1,0 +1,124 @@
+---
+title: "pit-recharge-geometries"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pit-recharge-geometries}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rechargepits)
+```
+
+
+This packages provides an analytical method to estimate the recharge from subsurface pits. Each method provided offers a simplified geometry of the pit and/or the recharge behavior in order to make the mathematics more tractable. The basic assumptions about flow within each of the models are those assumptions made by the Green-Ampt method:
+
+1. Homogeneous soil with initial water content (VWC_0)
+2. Constant pressure head (h_0) at the wetting front
+3. Saturated soil above above wetting front
+4. Continuous supply of water with constant head (h_b) at the soil surface boundary
+
+With respect to the pits, further assumptions are made as described below.
+
+## Rectangular pit with perpendicular flow
+
+In this case, the pit is represented as a rectangular volume with a length, width, and depth. All flow occurs perpendicular to the pit. Therefore the calculated recharge underestimates the actual recharge because this approach fails to account for (e.g.) diagonal flow away from the corners of the pit, which may represent considerable flow.
+
+```{r include = FALSE}
+library(ggplot2) 
+library(dplyr)
+library(patchwork)
+rect_base <- data.frame(x = c(-0.5, 0.5, 0.5, -0.5), y = c(-0.5, -0.5, 0.5, 0.5))
+arrow_base <- data.frame(x = c(-0.5, 0, 0.5, 0), 
+                            y = c(0, -0.5, 0, 0.5))
+top_df_arrows <- arrow_base %>%
+  mutate(xend = x*1.5, yend = y*1.5)
+bottom_df_arrows <- arrow_base %>% 
+  mutate(y = y*1.5,
+         xend = x*1.5,
+         yend = y + 0.25 * sign(y)) %>% filter(y <= 0)
+bottom_df <- rect_base %>% mutate(y = y*1.5)
+p_top <- ggplot() + 
+  geom_polygon(data = rect_base, aes(x, y), color = "black", fill = NA) +
+  geom_segment(data = top_df_arrows, aes(x, y, xend = xend, yend = yend), arrow = grid::arrow(length = unit(0.5, "cm")))  +
+  coord_equal()
+
+p_side <- ggplot() +
+  geom_polygon(data = bottom_df, aes(x, y - 0.75), color = "black", fill = NA) +
+  geom_segment(data = bottom_df_arrows, aes(x, y - 0.75, xend = xend, yend = yend - 0.75), arrow = grid::arrow(length = unit(0.5, "cm"))) +
+  ylab("z") + xlab("x") +
+  coord_equal()
+
+# p_top / p_side
+```
+
+### Vertical flow: Green-Ampt equation
+
+To derive the Green-Ampt equation, we need to combine the following equations. First, Darcy flow:
+
+$$
+q = -K_{sat} \frac{\partial h}{\partial z}
+$$
+Where $q$ is the downward Darcy point flow, $h$ is hydraulic head as the sum of pressure and elevation head, $K_{sat}$ is saturated hydraulic conductivity, and $z$ is elevation (positive is downward). Note that the total head at the bottom of the pit ($z=0$) is $h_b$ and at the wetting front ($z=z_f$) is $h_0 - z_f$. Due to the linear relationship between $h$ and $z$, integrating this equation allows us to calculate $q$ as:
+
+$$
+q = K_{sat} \frac{h_b - (h_0 - z_f)}{z_f}
+$$
+
+We also know that the downward propagation of the wetting front occurs at the rate 
+
+$$\frac{\partial z_f}{\partial t} = \frac{q}{\Delta \theta},$$ 
+
+where $\Delta \theta = \theta_s - \theta_0$. We further know that the cumulative infiltration is $F = z_f \Delta \theta$, and combining the above equations with this substitution yields:
+
+$$
+\frac{F}{\Delta \theta} \frac{\partial F}{\partial t} = K_{sat} (h_b + F/\Delta \theta - h_0)
+$$
+
+
+Integration of the above equation yields the Green-Ampt equation, with time $t$ as a function of cumulative 1-D infiltration $F$:
+
+$$
+t = \frac{1}{K_{sat}}\Big[F - \Delta \theta (h_b - h_0) \ln (1 + \frac{F}{\Delta \theta (h_b - h_0)}) \Big]
+$$
+
+The Green-Ampt equation is implemented in this package through the function `get_greenampt_time` which implements the analytical version, as well as the function `get_greenampt_flow_numerical` which uses a root solver to find cumulative infiltration as a function of time. Note that the package functions expects `units` objects where appropriate to ensure proper arithmetic with dimensional variables. Below, the numerical approximation calculates $F$ at $t \in [0, 2, 5, 10, 20, 40, 60]$ minutes.
+
+```{r}
+# prep soil variables
+library(rechargepits)
+library(units)
+VWC_0 <- 0.2 # unitless
+n <- 0.35 # unitless
+Ksat <- set_units(0.2, "cm/h") # length / time
+h_b <- set_units(6, "ft") # hydraulic head (length)
+h_0 <- set_units(-10, "cm") # hydraulic head (length)
+times <- set_units(c(0, 2, 5, 10, 20, 40, 60), "min")
+
+# Calculate cumulative infiltration as a function of time
+Fcum <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+Fcum
+```
+Note that the returned vector is a `units` object, in this case with units of mm. We can make sure the two functions produce the same results by using the analytical version to convert back to time as follows, and plot the results.
+
+```{r fig.width = 6}
+# Calculate time as a function of Fcum 
+time_calc <- set_units(get_greenampt_time(VWC_0, n, Fcum, Ksat, h_b, h_0),"min")
+
+df <- data.frame(time = c(times, time_calc),
+                 Fcum = rep(Fcum, 2),
+                 group = rep(c("Fcum = f(t)", "t = f(Fcum)"), each = length(Fcum)))
+library(ggplot2)
+ggplot(df) + 
+  geom_point(aes(time, Fcum, color = group, shape = group), size = 3, stroke = 1) +
+  scale_shape_manual(values = c(1, 3))
+```
+
