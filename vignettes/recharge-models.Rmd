@@ -1,8 +1,8 @@
 ---
-title: "pit-recharge-geometries"
+title: "recharge-models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{pit-recharge-geometries}
+  %\VignetteIndexEntry{recharge-models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,47 +18,16 @@ knitr::opts_chunk$set(
 library(rechargepits)
 ```
 
+# Recharge models
 
-This packages provides an analytical method to estimate the recharge from subsurface pits. Each method provided offers a simplified geometry of the pit and/or the recharge behavior in order to make the mathematics more tractable. The basic assumptions about flow within each of the models are those assumptions made by the Green-Ampt method:
+This packages provides analytical and root-finding methods for calculating groundwater recharge under specific geometries. In each case, the models follow assumptions used in the Green-Ampt method:
 
 1. Homogeneous soil with initial water content (VWC_0)
 2. Constant pressure head (h_0) at the wetting front
 3. Saturated soil above above wetting front
 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
 
-With respect to the pits, further assumptions are made as described below.
-
-## Rectangular pit with perpendicular flow
-
-In this case, the pit is represented as a rectangular volume with a length, width, and depth. All flow occurs perpendicular to the pit. Therefore the calculated recharge underestimates the actual recharge because this approach fails to account for (e.g.) diagonal flow away from the corners of the pit, which may represent considerable flow.
-
-```{r include = FALSE}
-library(ggplot2) 
-library(dplyr)
-library(patchwork)
-rect_base <- data.frame(x = c(-0.5, 0.5, 0.5, -0.5), y = c(-0.5, -0.5, 0.5, 0.5))
-arrow_base <- data.frame(x = c(-0.5, 0, 0.5, 0), 
-                            y = c(0, -0.5, 0, 0.5))
-top_df_arrows <- arrow_base %>%
-  mutate(xend = x*1.5, yend = y*1.5)
-bottom_df_arrows <- arrow_base %>% 
-  mutate(y = y*1.5,
-         xend = x*1.5,
-         yend = y + 0.25 * sign(y)) %>% filter(y <= 0)
-bottom_df <- rect_base %>% mutate(y = y*1.5)
-p_top <- ggplot() + 
-  geom_polygon(data = rect_base, aes(x, y), color = "black", fill = NA) +
-  geom_segment(data = top_df_arrows, aes(x, y, xend = xend, yend = yend), arrow = grid::arrow(length = unit(0.5, "cm")))  +
-  coord_equal()
-
-p_side <- ggplot() +
-  geom_polygon(data = bottom_df, aes(x, y - 0.75), color = "black", fill = NA) +
-  geom_segment(data = bottom_df_arrows, aes(x, y - 0.75, xend = xend, yend = yend - 0.75), arrow = grid::arrow(length = unit(0.5, "cm"))) +
-  ylab("z") + xlab("x") +
-  coord_equal()
-
-# p_top / p_side
-```
+The building blocks of the pit recharge calculations are analytical equations simulating the specific infiltration scenarios described below. 
 
 ### Vertical flow: Green-Ampt equation
 
@@ -122,3 +91,62 @@ ggplot(df) +
   scale_shape_manual(values = c(1, 3))
 ```
 
+### Horizontal flow: Green-Ampt without gravity
+
+This scenario is similar to Green-Ampt except that the flow occurs horizontally through a vertical surface. Darcy flow in this case can be calculated as:
+$$
+q = K_{sat} \frac{h_b - h_0}{x_f},
+$$
+where the only new variable is $x_f$, the horizontal distance from the soil boundary to the wetting front. Note that $x_f$ is not present in the numerator. This equation becomes:
+
+$$
+\frac{F}{\Delta \theta} \frac{\partial F}{\partial t} = K_{sat} (h_b - h_0).
+$$
+
+Once integrated, we get two versions of the final equations, one solved for $t$:
+$$
+t = \frac{F^2}{2 \Delta \theta K_{sat} (h_b - h_0)}
+$$
+and the other for $F$:
+$$
+F = \sqrt{2 \Delta \theta K_{sat} (h_b - h_0) t},
+$$
+
+Using the same soil properties as above, we can calculate infiltration using `get_greenampt_horiz_flow` and `get_greenampt_horiz_time`:
+
+```{r}
+# Calculate cumulative infiltration as a function of time
+Fcum_horiz <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, times)
+Fcum_horiz
+```
+
+```{r fig.width = 6}
+time_calc <- set_units(get_greenampt_horiz_time(VWC_0, n, Fcum_horiz, Ksat, h_b, h_0),"min")
+
+df <- data.frame(time = c(times, time_calc),
+                 Fcum = rep(Fcum, 2),
+                 group = rep(c("Fcum = f(t)", "t = f(Fcum)"), each = length(Fcum)))
+library(ggplot2)
+ggplot(df) + 
+  geom_point(aes(time, Fcum, color = group, shape = group), size = 3, stroke = 1) +
+  scale_shape_manual(values = c(1, 3))
+
+```
+
+### Horizontal flow integrated over a depth
+
+Now we'd like to have a single equation to calculate the horizontal infiltration over a vertical surface, which we refer to as $F_v$, while noting that $\Delta F_v = F \Delta z$. Therefore we need to integrate, noting that we now use $h_p(z)$ to indicate the pressure head in the pit:
+
+$$
+F_v = \int F \partial z = \sqrt{2 \Delta \theta K_{sat} t} \int_{z_1}^{z_1 + d} (h_p(z) - h_0)^{1/2} \partial z
+$$
+
+where $d$ is the thickness of the pit. If we define $z$ as being positive in the downward direction then $h_p = z$. If $h_b$ is the pressure head at the bottom, then $z_2 = h_b$ and $z_1 = h_b - d$ at the top of the pit. The integration becomes:
+
+$$
+F_v = \sqrt{2 \Delta \theta K_{sat} t} \int_{h_b - d}^{h_b} (z - h_0)^{1/2} \partial z 
+$$
+Integrating the right side we end up with:
+$$
+F_v = \sqrt{\frac{8}{9} \Delta \theta K_{sat} t} \Big[(h_b - h_0)^{3/2} - (h_b - d - h_0)^{3/2} \Big]
+$$
