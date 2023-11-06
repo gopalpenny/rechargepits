@@ -2,7 +2,7 @@
 % Please edit documentation in R/pit_recharge.R
 \name{get_greenampt_horiz_flow_integrated}
 \alias{get_greenampt_horiz_flow_integrated}
-\title{Horizontal Green-Ampt flow time}
+\title{Horizontal Green-Ampt flow integrated}
 \usage{
 get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t)
 }
@@ -43,5 +43,5 @@ Fcum <- set_units(20, "mm") # depth
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
-Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = 1)
+Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"))
 }

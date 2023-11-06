@@ -54,6 +54,53 @@ get_greenampt_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 }
 
 
+
+#' Green-Ampt flow
+#'
+#' @inheritParams get_greenampt_time
+#' @param times Times to calculate total infiltration
+#' @export
+#' @description
+#' This function models the Green-Ampt equation, with a saturated
+#' surface flowing vertically downward into a soil profile. The
+#' assumptions are:
+#'
+#' 1. Homogeneous soil with initial water content (VWC_0)
+#' 2. Constant pressure head (h_0) at the wetting front
+#' 3. Saturated soil above above wetting front
+#' 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
+#'
+#' With these assumptions, the amount of time for a particular infiltration depth (Fcum)
+#' can be calculated using Darcy's law as:
+#'
+#' $$t = 1/Ksat * (Fcum - (n - VWC_0)(h_b - h_0) * ln(1 + Fcum / ((n - VWC_0)(h_b - h_))))$$
+#'
+#' The cumulative infiltration is then found using a numerical root solver,
+#' `uniroot`.
+#'
+#' @returns Returns the cumulative infiltration at times given by `times`.
+#' @export
+#' @examples
+#'
+#' library(units)
+#' VWC_0 <- 0.2 # unitless
+#' n <- 0.35 # unitless
+#' Fcum <- set_units(1:20, "mm") # depth
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- set_units(seq(5, 60, by= 5), "min")
+#' fcum <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+#' # Double check that we get the original times back with the Green-Ampt equation
+#' set_units(get_greenampt_time(VWC_0, n, fcum, Ksat, h_b, h_0),"min")
+get_greenampt_flow_numerical <- function(VWC_0, n, Ksat, h_b, h_0, times) {
+  Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
+                                     VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
+
+  return(Fcum_vert)
+}
+
+
 #' Horizontal Green-Ampt flow time
 #'
 #'
@@ -89,7 +136,8 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 }
 
 
-#' Horizontal Green-Ampt flow time
+
+#' Horizontal Green-Ampt flow integrated
 #'
 #'
 #' @inheritParams get_greenampt_time
