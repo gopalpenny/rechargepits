@@ -185,7 +185,37 @@ The percent error is `r round((Fv_point - F_point) / F_point * 100, 3)`\%.
 
 ### Horizontal flow through a cylinder
 
-To come soon.
+We now focus on horizontal flow (i.e., no gravity effect) radially outward through cylinder. In this case the goal is to calculate the radius of the wetting front ($r_f$), from which the cumulative infiltration can be calculated at any time $t$ as $F_r = \pi (r_f^2 - r_b^2)/\Delta \theta$, where $r_b$ is the boundary of the recharge pit.
+
+We note that $Q = 2 \pi r q(r)$ and therefore $q = \frac{Q}{2 \pi r}$. Because $q$ is the Darcy flow, we can plug this into Darcy's law to obtain:
+$$
+\frac{Q}{2 \pi r} = -K_{sat} \frac{\partial h}{\partial r}
+$$
+Integrating this equation from $(r_b, h_b)$ to $(r_f, h_0)$, we get:
+$$
+Q = 2 \pi K_{sat} (h_b - h_0) \frac{1}{\ln (r_f / r_b)}
+$$
+
+We further note that $\frac{\partial r_f}{\partial t} = \frac{Q}{2 \pi r_f \Delta \theta}$. Plugging in the equation for $Q$ and rearranging, we obtain:
+$$
+r_f \ln(r_f / r_b) \partial r_f = \frac{1}{\Delta \theta }(h_b - h_0) \partial t
+$$
+Integrating the two sides from $(t = 0, r = r_b)$ to $(t, r_f)$, we obtain (via wolfram alpha):
+$$
+\frac{1}{4} (r_b^2 + 2 r_f^2 \ln \frac{r_f}{r_b} - r_f^2) = t\frac{h_b - h_0}{\Delta \theta }
+$$
+Finally, solving for $t$, we obtain:
+$$
+t = \frac{\Delta \theta}{4 (h_b - h_0)} (r_b^2 + 2 r_f^2 \ln \frac{r_f}{r_b} - r_f^2)
+$$
+$$
+t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln \frac{r_f}{r_b} - 1) \Big]
+$$
+As noted above, it is straightforward to convert between $F_r$ and $r_f$. Rearranging the equation, we have:
+$$
+r_f = \sqrt{F_r \frac{\Delta \theta}{\pi} + r_b^2}
+$$
+
 
 ## Spherical flow without gravity
 

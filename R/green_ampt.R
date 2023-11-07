@@ -248,3 +248,44 @@ get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d =
 
 
 
+#' Green-Ampt horizontal flow time
+#'
+#'
+#' @inheritParams get_greenampt_time
+#' @param r_b
+#' @export
+#' @description
+#' This function models saturated horizontal flow from a saturated
+#' surface into a soil profile. The assumptions are the same as
+#' in the Green-Ampt equation, except that there is no effect of
+#' gravity because all flow is assumed to be horizontal. The equation is:
+#'
+#' $$F^2$$
+#' $$F^2$$
+#' $$F^2$$
+#' @returns Returns the time at which a cumulative amount of
+#' infiltration occurs.
+#' @examples
+#'
+#' library(units)
+#' r_b <- set_units(2, "ft") # length
+#' VWC_0 <- 0.2 # unitless
+#' n <- 0.35 # unitless
+#' F_r <- set_units(10, "ft^2") # units of length^2
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- get_greenampt_cyl_horiz_time(VWC_0, n, F_r, Ksat, h_b, h_0, r_b)
+get_greenampt_cyl_horiz_time <- function(VWC_0, n, F_r, Ksat, h_b, h_0, r_b) {
+  dVWC <- n - VWC_0
+
+  r_f <- sqrt(F_r * dVWC / pi + r_b^2)
+
+  t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + 2 * r_f^2 * as.numeric(log(r_f/r_b)) - r_f^2)
+  # t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + r_f^2 * (2 * as.numeric(log(r_f/r_b)) - 1))
+
+  return(t)
+}
+
+
+
