@@ -26,7 +26,7 @@
 get_rawls_soil <- function(soil_name) {
   all_soils <- rawls_soils
   soil_rawls <- all_soils[all_soils$texture_class %in% soil_name,]
-  if (nrow(soil_rawls) <= 1) {
+  if (nrow(soil_rawls) < 1) {
     stop("Invalid soil name: ", soil_name)
   }
   return(soil_rawls)

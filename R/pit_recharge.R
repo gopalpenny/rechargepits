@@ -8,6 +8,7 @@
 #' @param height
 #' @param length
 #' @param width
+#' @export
 #' @details
 #' This function calculates infiltration from a rectangular pit,
 #' using the assumptions in the Green Ampt equation. The infiltration

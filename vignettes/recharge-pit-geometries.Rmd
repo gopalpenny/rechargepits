@@ -19,7 +19,7 @@ With respect to the pits, further assumptions are made as described below.
 
 ## Rectangular pit with perpendicular flow
 
-In this case, the pit is represented as a rectangular volume with a length, width, and depth. All flow occurs perpendicular to the pit. Therefore the calculated recharge underestimates the actual recharge because this approach fails to account for (e.g.) diagonal flow away from the corners of the pit, which may represent considerable flow.
+In this case, the pit is represented as a rectangular volume with a length, width, and depth. All flow occurs perpendicular to the pit. Therefore the calculated recharge underestimates the actual recharge because this approach fails to account for (e.g.) diagonal flow away from the corners of the pit, which may represent considerable flow
 
 ```{r include = FALSE}
 library(ggplot2) 
@@ -46,5 +46,51 @@ p_side <- ggplot() +
   ylab("z") + xlab("x") +
   coord_equal()
 
-# p_top / p_side
+p_top / p_side
 ```
+
+In order to set up the model, the dimensions of the pit must be set as `units` objects. For example:
+
+```{r}
+library(units)
+length <- set_units(4, "ft")
+width <- set_units(4, "ft")
+height <- set_units(6, "ft")
+```
+
+Additionally, initial water content (`VWC_0`), porosity (`n`), saturated hydraulic conductivity (`Ksat`), and the time(s) at which the infiltration should be estimated (`times`). 
+
+```{r}
+VWC_0 <- 0.2 # unitless
+n <- 0.35 # unitless
+Ksat <- set_units(0.2, "cm/h") # length / time
+h_0 <- set_units(-10, "cm") # hydraulic head (length)
+times <- set_units(1,"hr")
+```
+
+These values are then provides to the function `get_pit_recharge_rectangular` as:
+
+```{r}
+library(rechargepits)
+get_pit_recharge_rectangular(height, length, width, n, Ksat, VWC_0, h_0, times)
+```
+
+Note that this function assumes the pit is filled with water beginning at t = 0, and that infiltration does not lead to a reduction in water in the pit over time (i.e., constant head profile within the pit throughout the infiltration event). 
+
+Also note that this approach is equivalent to using the built-in functions to estimate pit recharge across vertical transects of the walls (`get_greenampt_horiz_flow_integrated`) and point recharge downward from the bottom of the pit (`get_greenampt_flow_numerical`). Multiplying these values to convert to volumes of recharge gives the final result.
+
+```{r}
+h_b <- height
+
+# get horizontal flow:
+Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = times)
+flow_horizontal <- Fv * (width * 2 + length * 2)
+
+fcum_vert <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+flow_vertical <- fcum_vert * width * length
+flow_vertical <- units::set_units(flow_vertical, units(flow_horizontal))
+
+flow <- flow_horizontal + flow_vertical
+flow
+```
+
