@@ -32,7 +32,7 @@ The building blocks of the pit recharge calculations are analytical equations si
 ## Vertical flow: Green-Ampt equation
 
 ```{r, out.width = "200px", echo = FALSE}
-knitr::include_graphics("../img/green-ampt-vertical.jpg")
+knitr::include_graphics("green-ampt-vertical.jpg")
 ```
 
 To derive the Green-Ampt equation, we need to combine the following equations. First, Darcy flow:
@@ -100,7 +100,7 @@ ggplot(df) +
 ### Horizontal parallel flow
 
 ```{r, out.width = "150px", echo = FALSE}
-knitr::include_graphics("../img/green-ampt-horizontal.jpg")
+knitr::include_graphics("green-ampt-horizontal.jpg")
 ```
 
 This scenario is similar to Green-Ampt except that the flow occurs horizontally through a vertical surface. Darcy flow in this case can be calculated as:
@@ -194,7 +194,7 @@ The percent error is `r round((Fv_point - F_point) / F_point * 100, 3)`\%.
 ### Horizontal flow through a cylinder
 
 ```{r, out.width = "200px", echo = FALSE}
-knitr::include_graphics("../img/green-ampt-circular.jpg")
+knitr::include_graphics("green-ampt-circular.jpg")
 ```
 
 We now focus on horizontal flow (i.e., no gravity effect) radially outward through cylinder. In this case the goal is to calculate the radius of the wetting front ($r_f$), from which the cumulative infiltration can be calculated at any time $t$ as $F_r = \pi (r_f^2 - r_b^2) \Delta \theta$, where $r_b$ is the boundary of the recharge pit.
