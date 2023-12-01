@@ -145,13 +145,17 @@ ggplot(df) +
 
 ### Horizontal parallel flow integrated over a depth
 
+```{r, out.width = "150px", echo = FALSE}
+knitr::include_graphics("green-ampt-horizontal-integrated.jpg")
+```
+
 Now we'd like to have a single equation to calculate the horizontal infiltration over a vertical surface, which we refer to as $F_v$, while noting that $\Delta F_v = F \Delta z$. Therefore we need to integrate, noting that we now use $h_p(z)$ to indicate the pressure head in the pit:
 
 $$
 F_v = \int F \partial z = \sqrt{2 \Delta \theta K_{sat} t} \int_{z_1}^{z_1 + d} (h_p(z) - h_0)^{1/2} \partial z
 $$
 
-where $d$ is the thickness of the pit. If we define $z$ as being positive in the downward direction then $h_p = z$. If $h_b$ is the pressure head at the bottom, then $z_2 = h_b$ and $z_1 = h_b - d$ at the top of the pit. The integration becomes:
+where $d$ is the depth of the profile over which to integrate (e.g., the bottom of the pit). If we define $z$ as being positive in the downward direction then $h_p = z$. We define $h_b$ as the pressure head at the bottom of the profile, which entails that $z_2 = h_b$ and $z_1 = h_b - d$ at the top of the pit. The integration becomes:
 
 $$
 F_v = \sqrt{2 \Delta \theta K_{sat} t} \int_{h_b - d}^{h_b} (z - h_0)^{1/2} \partial z 
@@ -242,5 +246,5 @@ $$
 $$
 Solving for $Q$, we obtain:
 $$
-Q = 2 \pi K_{sat} \Big(\frac{r_b r_f}{r_f - r_b}) (h_b - h_0)
+Q = 2 \pi K_{sat} \Big(\frac{r_b r_f}{r_f - r_b} \Big) (h_b - h_0)
 $$
