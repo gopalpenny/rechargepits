@@ -69,16 +69,16 @@ $$F^2$$</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_greenampt_horiz_time</span><span class="op">(</span><span class="va">VWC_0</span>, <span class="va">n</span>, <span class="va">Fcum</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_greenampt_horiz_time</span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Fcum</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>VWC_0</dt>
+    <dl><dt>theta_0</dt>
 <dd><p>Soil volumetric water content prior to event</p></dd>
 
 
-<dt>n</dt>
+<dt>theta_s</dt>
 <dd><p>Soil porosity</p></dd>
 
 
@@ -110,13 +110,13 @@ infiltration occurs.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-quantities.github.io/units/" class="external-link">units</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">VWC_0</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="co"># unitless</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">0.35</span> <span class="co"># unitless</span></span></span>
+<span class="r-in"><span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="co"># unitless</span></span></span>
+<span class="r-in"><span><span class="va">theta_s</span> <span class="op">&lt;-</span> <span class="fl">0.35</span> <span class="co"># unitless</span></span></span>
 <span class="r-in"><span><span class="va">Fcum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">20</span>, <span class="st">"mm"</span><span class="op">)</span> <span class="co"># depth</span></span></span>
 <span class="r-in"><span><span class="va">Ksat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="st">"cm/h"</span><span class="op">)</span> <span class="co"># length / time</span></span></span>
 <span class="r-in"><span><span class="va">h_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"ft"</span><span class="op">)</span> <span class="co"># hydraulic head (length)</span></span></span>
 <span class="r-in"><span><span class="va">h_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="st">"cm"</span><span class="op">)</span> <span class="co"># hydraulic head (length)</span></span></span>
-<span class="r-in"><span><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu">get_greenampt_horiz_time</span><span class="op">(</span><span class="va">VWC_0</span>, <span class="va">n</span>, <span class="va">Fcum</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu">get_greenampt_horiz_time</span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Fcum</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>

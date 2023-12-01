@@ -24,22 +24,22 @@
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- set_units(1,"hr")
 #' length <- set_units(4, "ft")
 #' width <- set_units(4, "ft")
 #' height <- set_units(6, "ft")
-get_pit_recharge_rectangular <- function(height, length, width, n, Ksat, VWC_0, h_0, times) {
+get_pit_recharge_rectangular <- function(height, length, width, theta_s, Ksat, theta_0, h_0, times) {
   h_b <- height
 
   # get horizontal flow:
-  Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = times)
+  Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = times)
   flow_horizontal <- Fv * (width * 2 + length * 2)
 
-  fcum_vert <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+  fcum_vert <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)
   flow_vertical <- fcum_vert * width * length
   flow_vertical <- units::set_units(flow_vertical, units(flow_horizontal))
 

@@ -22,7 +22,7 @@ library(rechargepits)
 
 This packages provides analytical and root-finding methods for calculating groundwater recharge under specific geometries. In each case, the models follow assumptions used in the Green-Ampt method:
 
-1. Homogeneous soil with initial water content (VWC_0)
+1. Homogeneous soil with initial water content (theta_0)
 2. Constant pressure head (h_0) at the wetting front
 3. Saturated soil above above wetting front
 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
@@ -69,22 +69,22 @@ The Green-Ampt equation is implemented in this package through the function `get
 # prep soil variables
 library(rechargepits)
 library(units)
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- set_units(c(0, 2, 5, 10, 20, 40, 60), "min")
 
 # Calculate cumulative infiltration as a function of time
-Fcum <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+Fcum <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)
 Fcum
 ```
 Note that the returned vector is a `units` object, in this case with units of mm. We can make sure the two functions produce the same results by using the analytical version to convert back to time as follows, and plot the results.
 
 ```{r fig.width = 6}
 # Calculate time as a function of Fcum 
-time_calc <- set_units(get_greenampt_time(VWC_0, n, Fcum, Ksat, h_b, h_0),"min")
+time_calc <- set_units(get_greenampt_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0),"min")
 
 df <- data.frame(time = c(times, time_calc),
                  Fcum = rep(Fcum, 2),
@@ -126,12 +126,12 @@ Using the same soil properties as above, we can calculate infiltration using `ge
 
 ```{r}
 # Calculate cumulative infiltration as a function of time
-Fcum_horiz <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, times)
+Fcum_horiz <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times)
 Fcum_horiz
 ```
 
 ```{r fig.width = 6}
-time_calc <- set_units(get_greenampt_horiz_time(VWC_0, n, Fcum_horiz, Ksat, h_b, h_0),"min")
+time_calc <- set_units(get_greenampt_horiz_time(theta_0, theta_s, Fcum_horiz, Ksat, h_b, h_0),"min")
 
 df <- data.frame(time = c(times, time_calc),
                  Fcum = rep(Fcum, 2),
@@ -169,25 +169,25 @@ This equation is implemented with `get_greenampt_horiz_flow_integrated`.
 
 ```{r}
 library(units)
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 
-Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
 ```
 
 To demonstrate this works, we can compare the point flow with the integrated flow over a differential depth (e.g., 1 mm):
 
 ```{r}
 # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-Fv_dv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
 Fv_point <- Fv_dv/ set_units(1, "mm")
 Fv_point
 
 # Get the point infiltration
-F_point <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr")) 
+F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr")) 
 F_point <- set_units(F_point, "mm")
 F_point
 # percent error: (Fv_point - F_point) / F_point * 100

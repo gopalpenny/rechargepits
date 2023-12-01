@@ -4,14 +4,14 @@
 \alias{get_pit_recharge_rectangular}
 \title{Rectangular pit flow}
 \usage{
-get_pit_recharge_rectangular(height, length, width, n, Ksat, VWC_0, h_0, times)
+get_pit_recharge_rectangular(height, length, width, theta_s, Ksat, theta_0, h_0, times)
 }
 \arguments{
-\item{n}{Soil porosity}
+\item{theta_s}{Soil porosity}
 
 \item{Ksat}{Saturated hydraulic conductivity}
 
-\item{VWC_0}{Soil volumetric water content prior to event}
+\item{theta_0}{Soil volumetric water content prior to event}
 
 \item{h_0}{Hydraulic head in soil prior to event}
 }
@@ -34,8 +34,8 @@ of length.
 \examples{
 
 library(units)
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- set_units(1,"hr")

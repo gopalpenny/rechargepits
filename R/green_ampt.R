@@ -3,8 +3,8 @@
 
 #' Green-Ampt flow time
 #'
-#' @param VWC_0 Soil volumetric water content prior to event
-#' @param n Soil porosity
+#' @param theta_0 Soil volumetric water content prior to event
+#' @param theta_s Soil porosity
 #' @param Fcum cumulative infiltration in mm water equivalent
 #' @param Ksat Saturated hydraulic conductivity
 #' @param h_b Hydraulic head at soil surface boundary
@@ -15,7 +15,7 @@
 #' surface flowing vertically downward into a soil profile. The
 #' assumptions are:
 #'
-#' 1. Homogeneous soil with initial water content (VWC_0)
+#' 1. Homogeneous soil with initial water content (theta_0)
 #' 2. Constant pressure head (h_0) at the wetting front
 #' 3. Saturated soil above above wetting front
 #' 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
@@ -23,22 +23,22 @@
 #' With these assumptions, the amount of time for a particular infiltration depth (Fcum)
 #' can be calculated using Darcy's law as:
 #'
-#' $$t = 1/Ksat * (Fcum - (n - VWC_0)(h_b - h_0) * ln(1 + Fcum / ((n - VWC_0)(h_b - h_))))$
+#' $$t = 1/Ksat * (Fcum - (theta_s - theta_0)(h_b - h_0) * ln(1 + Fcum / ((theta_s - theta_0)(h_b - h_))))$
 #'
 #' @returns Returns the time at which a cumulative amount of
 #' infiltration occurs.
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Fcum <- set_units(1:20, "mm") # depth
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' get_greenampt_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
-get_greenampt_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
-  dVWC <- n - VWC_0
+#' get_greenampt_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
+get_greenampt_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
+  dVWC <- theta_s - theta_0
   d_h <- h_b - h_0
 
   depth_over_dVWC <- Fcum / dVWC / d_h
@@ -65,7 +65,7 @@ get_greenampt_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' surface flowing vertically downward into a soil profile. The
 #' assumptions are:
 #'
-#' 1. Homogeneous soil with initial water content (VWC_0)
+#' 1. Homogeneous soil with initial water content (theta_0)
 #' 2. Constant pressure head (h_0) at the wetting front
 #' 3. Saturated soil above above wetting front
 #' 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
@@ -73,7 +73,7 @@ get_greenampt_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' With these assumptions, the amount of time for a particular infiltration depth (Fcum)
 #' can be calculated using Darcy's law as:
 #'
-#' $$t = 1/Ksat * (Fcum - (n - VWC_0)(h_b - h_0) * ln(1 + Fcum / ((n - VWC_0)(h_b - h_))))$$
+#' $$t = 1/Ksat * (Fcum - (theta_s - theta_0)(h_b - h_0) * ln(1 + Fcum / ((theta_s - theta_0)(h_b - h_))))$$
 #'
 #' The cumulative infiltration is then found using a numerical root solver,
 #' `uniroot`.
@@ -83,19 +83,19 @@ get_greenampt_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Fcum <- set_units(1:20, "mm") # depth
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- set_units(seq(5, 60, by= 5), "min")
-#' fcum <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+#' fcum <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)
 #' # Double check that we get the original times back with the Green-Ampt equation
-#' set_units(get_greenampt_time(VWC_0, n, fcum, Ksat, h_b, h_0),"min")
-get_greenampt_flow_numerical <- function(VWC_0, n, Ksat, h_b, h_0, times) {
+#' set_units(get_greenampt_time(theta_0, theta_s, fcum, Ksat, h_b, h_0),"min")
+get_greenampt_flow_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, times) {
   Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
-                                     VWC_0 = VWC_0, n = n, Ksat = Ksat, h_b = h_b, h_0 = h_0)
+                                     theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 
   return(Fcum_vert)
 }
@@ -120,17 +120,17 @@ get_greenampt_flow_numerical <- function(VWC_0, n, Ksat, h_b, h_0, times) {
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Fcum <- set_units(20, "mm") # depth
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- set_units(seq(5, 60, by= 5), "min")
-#' Fcum <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, times)
-get_greenampt_horiz_flow <- function(VWC_0, n, Ksat, h_b, h_0, times) {
+#' Fcum <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times)
+get_greenampt_horiz_flow <- function(theta_0, theta_s, Ksat, h_b, h_0, times) {
 
-  dVWC <- n - VWC_0
+  dVWC <- theta_s - theta_0
 
   units::units_options(set_units_mode = "standard")
 
@@ -162,15 +162,15 @@ get_greenampt_horiz_flow <- function(VWC_0, n, Ksat, h_b, h_0, times) {
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Fcum <- set_units(20, "mm") # depth
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' times <- get_greenampt_horiz_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
-get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
-  dVWC = n - VWC_0
+#' times <- get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
+get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
+  dVWC = theta_s - theta_0
 
   t = 1/2 * Fcum^2 / (dVWC * Ksat * (h_b - h_0))
 
@@ -202,24 +202,24 @@ get_greenampt_horiz_time <- function(VWC_0, n, Fcum, Ksat, h_b, h_0) {
 #' @examples
 #'
 #' library(units)
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #'
-#' Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+#' Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
 #'
 #' # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-#' Fv_dv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+#' Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
 #' Fv_point <- Fv_dv/ set_units(1, "mm")
 #' Fv_point
 #' # Get the point infiltration
-#' F_point <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, t = set_units(1,"hr")) %>% set_units("mm")
+#' F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr")) %>% set_units("mm")
 #' F_point
 #' # percent error:
 #' (Fv_point - F_point) / F_point * 100
-get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d = NULL) {
+get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, t, d = NULL) {
 
   units::units_options(set_units_mode = "standard")
 
@@ -229,7 +229,7 @@ get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d =
 
   units_obj <- d^2
 
-  dVWC <- n - VWC_0
+  dVWC <- theta_s - theta_0
   # h_diff <- h_b - h_0
 
   t_num <- as.numeric(set_units(t, "h"))
@@ -269,15 +269,15 @@ get_greenampt_horiz_flow_integrated <- function(VWC_0, n, Ksat, h_b, h_0, t, d =
 #'
 #' library(units)
 #' r_b <- set_units(2, "ft") # length
-#' VWC_0 <- 0.2 # unitless
-#' n <- 0.35 # unitless
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
 #' F_r <- set_units(10, "ft^2") # units of length^2
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' times <- get_greenampt_cyl_horiz_time(VWC_0, n, F_r, Ksat, h_b, h_0, r_b)
-get_greenampt_cyl_horiz_time <- function(VWC_0, n, F_r, Ksat, h_b, h_0, r_b) {
-  dVWC <- n - VWC_0
+#' times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b)
+get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b) {
+  dVWC <- theta_s - theta_0
 
   r_f <- sqrt(F_r * dVWC / pi + r_b^2)
 

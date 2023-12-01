@@ -4,12 +4,12 @@
 \alias{get_greenampt_horiz_time}
 \title{Green-Ampt horizontal flow time}
 \usage{
-get_greenampt_horiz_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
+get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
 }
 \arguments{
-\item{VWC_0}{Soil volumetric water content prior to event}
+\item{theta_0}{Soil volumetric water content prior to event}
 
-\item{n}{Soil porosity}
+\item{theta_s}{Soil porosity}
 
 \item{Fcum}{cumulative infiltration in mm water equivalent}
 
@@ -36,11 +36,11 @@ $$F^2$$
 \examples{
 
 library(units)
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Fcum <- set_units(20, "mm") # depth
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
-times <- get_greenampt_horiz_time(VWC_0, n, Fcum, Ksat, h_b, h_0)
+times <- get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
 }

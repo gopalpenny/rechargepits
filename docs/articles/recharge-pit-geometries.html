@@ -87,7 +87,7 @@ of the pit and/or the recharge behavior in order to make the mathematics
 more tractable. The basic assumptions about flow within each of the
 models are those assumptions made by the Green-Ampt method:</p>
 <ol style="list-style-type: decimal">
-<li>Homogeneous soil with initial water content (VWC_0)</li>
+<li>Homogeneous soil with initial water content (theta_0)</li>
 <li>Constant pressure head (h_0) at the wetting front</li>
 <li>Saturated soil above above wetting front</li>
 <li>Continuous supply of water with constant head (h_b) at the soil
@@ -112,13 +112,13 @@ as <code>units</code> objects. For example:</p>
 <code class="sourceCode R"><span><span class="va">length</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">4</span>, <span class="st">"ft"</span><span class="op">)</span></span>
 <span><span class="va">width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">4</span>, <span class="st">"ft"</span><span class="op">)</span></span>
 <span><span class="va">height</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"ft"</span><span class="op">)</span></span></code></pre></div>
-<p>Additionally, initial water content (<code>VWC_0</code>), porosity
-(<code>n</code>), saturated hydraulic conductivity (<code>Ksat</code>),
+<p>Additionally, initial water content (<code>theta_0</code>), porosity
+(<code>theta_s</code>), saturated hydraulic conductivity (<code>Ksat</code>),
 and the time(s) at which the infiltration should be estimated
 (<code>times</code>).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">VWC_0</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="co"># unitless</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">0.35</span> <span class="co"># unitless</span></span>
+<code class="sourceCode R"><span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="co"># unitless</span></span>
+<span><span class="va">theta_s</span> <span class="op">&lt;-</span> <span class="fl">0.35</span> <span class="co"># unitless</span></span>
 <span><span class="va">Ksat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="st">"cm/h"</span><span class="op">)</span> <span class="co"># length / time</span></span>
 <span><span class="va">h_0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="st">"cm"</span><span class="op">)</span> <span class="co"># hydraulic head (length)</span></span>
 <span><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">1</span>,<span class="st">"hr"</span><span class="op">)</span></span></code></pre></div>
@@ -126,7 +126,7 @@ and the time(s) at which the infiltration should be estimated
 <code>get_pit_recharge_rectangular</code> as:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rechargepits</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/get_pit_recharge_rectangular.html">get_pit_recharge_rectangular</a></span><span class="op">(</span><span class="va">height</span>, <span class="va">length</span>, <span class="va">width</span>, <span class="va">n</span>, <span class="va">Ksat</span>, <span class="va">VWC_0</span>, <span class="va">h_0</span>, <span class="va">times</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/get_pit_recharge_rectangular.html">get_pit_recharge_rectangular</a></span><span class="op">(</span><span class="va">height</span>, <span class="va">length</span>, <span class="va">width</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">theta_0</span>, <span class="va">h_0</span>, <span class="va">times</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## 9.301142 [ft^3]</span></span></code></pre>
 <p>Note that this function assumes the pit is filled with water
 beginning at t = 0, and that infiltration does not lead to a reduction
@@ -142,10 +142,10 @@ convert to volumes of recharge gives the final result.</p>
 <code class="sourceCode R"><span><span class="va">h_b</span> <span class="op">&lt;-</span> <span class="va">height</span></span>
 <span></span>
 <span><span class="co"># get horizontal flow:</span></span>
-<span><span class="va">Fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_horiz_flow_integrated.html">get_greenampt_horiz_flow_integrated</a></span><span class="op">(</span><span class="va">VWC_0</span>, <span class="va">n</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, t <span class="op">=</span> <span class="va">times</span><span class="op">)</span></span>
+<span><span class="va">Fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_horiz_flow_integrated.html">get_greenampt_horiz_flow_integrated</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, t <span class="op">=</span> <span class="va">times</span><span class="op">)</span></span>
 <span><span class="va">flow_horizontal</span> <span class="op">&lt;-</span> <span class="va">Fv</span> <span class="op">*</span> <span class="op">(</span><span class="va">width</span> <span class="op">*</span> <span class="fl">2</span> <span class="op">+</span> <span class="va">length</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fcum_vert</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_flow_numerical.html">get_greenampt_flow_numerical</a></span><span class="op">(</span><span class="va">VWC_0</span>, <span class="va">n</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, <span class="va">times</span><span class="op">)</span></span>
+<span><span class="va">fcum_vert</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_flow_numerical.html">get_greenampt_flow_numerical</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, <span class="va">times</span><span class="op">)</span></span>
 <span><span class="va">flow_vertical</span> <span class="op">&lt;-</span> <span class="va">fcum_vert</span> <span class="op">*</span> <span class="va">width</span> <span class="op">*</span> <span class="va">length</span></span>
 <span><span class="va">flow_vertical</span> <span class="op">&lt;-</span> <span class="fu">units</span><span class="fu">::</span><span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="va">flow_vertical</span>, <span class="fu"><a href="https://rdrr.io/r/base/units.html" class="external-link">units</a></span><span class="op">(</span><span class="va">flow_horizontal</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>

@@ -10,7 +10,7 @@ vignette: >
 
 This packages provides an analytical method to estimate the recharge from subsurface pits. Each method provided offers a simplified geometry of the pit and/or the recharge behavior in order to make the mathematics more tractable. The basic assumptions about flow within each of the models are those assumptions made by the Green-Ampt method:
 
-1. Homogeneous soil with initial water content (VWC_0)
+1. Homogeneous soil with initial water content (theta_0)
 2. Constant pressure head (h_0) at the wetting front
 3. Saturated soil above above wetting front
 4. Continuous supply of water with constant head (h_b) at the soil surface boundary
@@ -58,11 +58,11 @@ width <- set_units(4, "ft")
 height <- set_units(6, "ft")
 ```
 
-Additionally, initial water content (`VWC_0`), porosity (`n`), saturated hydraulic conductivity (`Ksat`), and the time(s) at which the infiltration should be estimated (`times`). 
+Additionally, initial water content (`theta_0`), porosity (`theta_s`), saturated hydraulic conductivity (`Ksat`), and the time(s) at which the infiltration should be estimated (`times`). 
 
 ```{r}
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- set_units(1,"hr")
@@ -72,7 +72,7 @@ These values are then provides to the function `get_pit_recharge_rectangular` as
 
 ```{r}
 library(rechargepits)
-get_pit_recharge_rectangular(height, length, width, n, Ksat, VWC_0, h_0, times)
+get_pit_recharge_rectangular(height, length, width, theta_s, Ksat, theta_0, h_0, times)
 ```
 
 Note that this function assumes the pit is filled with water beginning at t = 0, and that infiltration does not lead to a reduction in water in the pit over time (i.e., constant head profile within the pit throughout the infiltration event). 
@@ -83,10 +83,10 @@ Also note that this approach is equivalent to using the built-in functions to es
 h_b <- height
 
 # get horizontal flow:
-Fv <- get_greenampt_horiz_flow_integrated(VWC_0, n, Ksat, h_b, h_0, t = times)
+Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = times)
 flow_horizontal <- Fv * (width * 2 + length * 2)
 
-fcum_vert <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b, h_0, times)
+fcum_vert <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)
 flow_vertical <- fcum_vert * width * length
 flow_vertical <- units::set_units(flow_vertical, units(flow_horizontal))
 

@@ -4,12 +4,12 @@
 \alias{get_greenampt_horiz_flow}
 \title{Green-Ampt horizontal flow}
 \usage{
-get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, times)
+get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times)
 }
 \arguments{
-\item{VWC_0}{Soil volumetric water content prior to event}
+\item{theta_0}{Soil volumetric water content prior to event}
 
-\item{n}{Soil porosity}
+\item{theta_s}{Soil porosity}
 
 \item{Ksat}{Saturated hydraulic conductivity}
 
@@ -35,12 +35,12 @@ $$F^2$$
 \examples{
 
 library(units)
-VWC_0 <- 0.2 # unitless
-n <- 0.35 # unitless
+theta_0 <- 0.2 # unitless
+theta_s <- 0.35 # unitless
 Fcum <- set_units(20, "mm") # depth
 Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- set_units(seq(5, 60, by= 5), "min")
-Fcum <- get_greenampt_horiz_flow(VWC_0, n, Ksat, h_b, h_0, times)
+Fcum <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times)
 }

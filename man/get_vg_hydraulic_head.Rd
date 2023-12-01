@@ -4,7 +4,7 @@
 \alias{get_vg_hydraulic_head}
 \title{van Genuchten Water Retention Curve}
 \usage{
-get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, n)
+get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, theta_s)
 }
 \arguments{
 \item{theta}{volumetric water content}
@@ -15,7 +15,7 @@ get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, n)
 
 \item{alpha}{scaling parameter (reciprocal of air entry pressure, units of 1/length)}
 
-\item{n}{curve shape, dimensionless}
+\item{theta_s}{curve shape, dimensionless}
 }
 \description{
 van Genuchten Water Retention Curve
@@ -33,6 +33,6 @@ theta <- 0.24
 theta_r <- 0.15
 theta_s <- 0.25
 alpha <- set_units(0.008, "1/cm") # should have units of 1/length
-n <- 10.4
-get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, n)
+theta_s <- 10.4
+get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, theta_s)
 }
