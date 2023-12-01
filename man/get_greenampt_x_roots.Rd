@@ -6,6 +6,11 @@
 \usage{
 get_greenampt_x_roots(times, x_units, green_ampt_function_name, ...)
 }
+\arguments{
+\item{times}{Times to calculate total infiltration}
+
+\item{x_units}{Units for output variable}
+}
 \description{
 Get green ampt roots
 }

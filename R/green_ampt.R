@@ -181,9 +181,8 @@ get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 
 #' Horizontal Green-Ampt flow integrated
 #'
-#'
-#' @inheritParams get_greenampt_time
-#' @param thickness Depth over which to be integrated. If NULL, set to h_b
+#' @inheritParams get_greenampt_flow_numerical
+#' @param d Depth over which to be integrated. If NULL, set to h_b
 #' @export
 #' @description
 #' This function models saturated horizontal flow from a saturated
@@ -208,18 +207,18 @@ get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #'
-#' Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+#' Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
 #'
 #' # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-#' Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+#' Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
 #' Fv_point <- Fv_dv/ set_units(1, "mm")
 #' Fv_point
 #' # Get the point infiltration
-#' F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr")) %>% set_units("mm")
+#' F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr")) %>% set_units("mm")
 #' F_point
 #' # percent error:
 #' (Fv_point - F_point) / F_point * 100
-get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, t, d = NULL) {
+get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, times, d = NULL) {
 
   units::units_options(set_units_mode = "standard")
 
@@ -232,7 +231,7 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
   dVWC <- theta_s - theta_0
   # h_diff <- h_b - h_0
 
-  t_num <- as.numeric(set_units(t, "h"))
+  t_num <- as.numeric(set_units(times, "h"))
 
   Ksat_num <- as.numeric(set_units(Ksat, "cm/h"))
   h_b_bottom_num <- as.numeric(set_units(h_b, "cm"))
@@ -248,11 +247,12 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
 
 
 
-#' Green-Ampt horizontal flow time
+#' Green-Ampt cylindrical horizontal flow time
 #'
 #'
 #' @inheritParams get_greenampt_time
-#' @param r_b
+#' @param r_b radius from the centroid to the free water--soil boundary
+#' @param F_r cumulative radial infiltration through the cylinder (units of L^2)
 #' @export
 #' @description
 #' This function models saturated horizontal flow from a saturated

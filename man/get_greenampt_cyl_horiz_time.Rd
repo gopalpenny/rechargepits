@@ -2,7 +2,7 @@
 % Please edit documentation in R/green_ampt.R
 \name{get_greenampt_cyl_horiz_time}
 \alias{get_greenampt_cyl_horiz_time}
-\title{Green-Ampt horizontal flow time}
+\title{Green-Ampt cylindrical horizontal flow time}
 \usage{
 get_greenampt_cyl_horiz_time(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b)
 }
@@ -11,11 +11,15 @@ get_greenampt_cyl_horiz_time(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b)
 
 \item{theta_s}{Soil porosity}
 
+\item{F_r}{cumulative radial infiltration through the cylinder (units of L^2)}
+
 \item{Ksat}{Saturated hydraulic conductivity}
 
 \item{h_b}{Hydraulic head at soil surface boundary}
 
 \item{h_0}{Hydraulic head in soil prior to event}
+
+\item{r_b}{radius from the centroid to the free water--soil boundary}
 }
 \value{
 Returns the time at which a cumulative amount of

@@ -1,6 +1,7 @@
 #' Get green ampt roots
 #'
-#'
+#' @inheritParams get_greenampt_flow_numerical
+#' @param x_units Units for output variable
 #' @export
 #' @examples
 #' library(units)

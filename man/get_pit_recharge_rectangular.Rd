@@ -4,9 +4,24 @@
 \alias{get_pit_recharge_rectangular}
 \title{Rectangular pit flow}
 \usage{
-get_pit_recharge_rectangular(height, length, width, theta_s, Ksat, theta_0, h_0, times)
+get_pit_recharge_rectangular(
+  height,
+  length,
+  width,
+  theta_s,
+  Ksat,
+  theta_0,
+  h_0,
+  times
+)
 }
 \arguments{
+\item{height}{vertical height (depth) of the pit}
+
+\item{length}{horizontal length of the pit}
+
+\item{width}{horizontal width of the pit}
+
 \item{theta_s}{Soil porosity}
 
 \item{Ksat}{Saturated hydraulic conductivity}
@@ -14,6 +29,8 @@ get_pit_recharge_rectangular(height, length, width, theta_s, Ksat, theta_0, h_0,
 \item{theta_0}{Soil volumetric water content prior to event}
 
 \item{h_0}{Hydraulic head in soil prior to event}
+
+\item{times}{Times to calculate total infiltration}
 }
 \description{
 Horizontal and vertical parallel flow from rectangular pit

@@ -83,7 +83,7 @@ Also note that this approach is equivalent to using the built-in functions to es
 h_b <- height
 
 # get horizontal flow:
-Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = times)
+Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = times)
 flow_horizontal <- Fv * (width * 2 + length * 2)
 
 fcum_vert <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)

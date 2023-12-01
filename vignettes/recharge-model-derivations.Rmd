@@ -2,7 +2,7 @@
 title: "recharge-model-derivations"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{recharge-models}
+  %\VignetteIndexEntry{recharge-model-derivations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(rechargepits)
 ```
 
-# Recharge models
+# Recharge model derivations
 
 This packages provides analytical and root-finding methods for calculating groundwater recharge under specific geometries. In each case, the models follow assumptions used in the Green-Ampt method:
 
@@ -175,25 +175,51 @@ Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 
-Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = NULL)
+Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
 ```
 
 To demonstrate this works, we can compare the point flow with the integrated flow over a differential depth (e.g., 1 mm):
 
 ```{r}
 # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr"), d = set_units(1, "mm"))
+Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
 Fv_point <- Fv_dv/ set_units(1, "mm")
 Fv_point
 
 # Get the point infiltration
-F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, t = set_units(1,"hr")) 
+F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr")) 
 F_point <- set_units(F_point, "mm")
 F_point
 # percent error: (Fv_point - F_point) / F_point * 100
 ```
 
 The percent error is `r round((Fv_point - F_point) / F_point * 100, 3)`\%. 
+
+This final example shows how the shape of the wetting front along the profile is curved.
+
+```{r}
+VWC_0 <- 0.2 # unitless
+n <- 0.35 # unitless
+Ksat <- set_units(0.2, "cm/h") # length / time
+h_b <- set_units(seq(0,6), "ft") # hydraulic head (length)
+h_0 <- set_units(-10, "cm") # hydraulic head (length)
+times <- set_units(c(60), "min")
+
+# Calculate cumulative infiltration as a function of time
+
+for (i in 1:length(h_b)) {
+  h_b_z <- h_b[i]
+  if (i == 0) {
+    Fcum[i] <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b_z, h_0, times)
+  } else {
+    Fcum[i] <- get_greenampt_flow_numerical(VWC_0, n, Ksat, h_b_z, h_0, times)
+ 
+  }
+}
+
+plot(Fcum, -h_b)
+```
+
 
 ### Horizontal flow through a cylinder
 

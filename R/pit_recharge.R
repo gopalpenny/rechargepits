@@ -4,10 +4,10 @@
 #' Rectangular pit flow
 #'
 #' Horizontal and vertical parallel flow from rectangular pit
-#' @inheritParams get_greenampt_time
-#' @param height
-#' @param length
-#' @param width
+#' @inheritParams get_greenampt_flow_numerical
+#' @param height vertical height (depth) of the pit
+#' @param length horizontal length of the pit
+#' @param width horizontal width of the pit
 #' @export
 #' @details
 #' This function calculates infiltration from a rectangular pit,
@@ -36,7 +36,7 @@ get_pit_recharge_rectangular <- function(height, length, width, theta_s, Ksat, t
   h_b <- height
 
   # get horizontal flow:
-  Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, t = times)
+  Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = times)
   flow_horizontal <- Fv * (width * 2 + length * 2)
 
   fcum_vert <- get_greenampt_flow_numerical(theta_0, theta_s, Ksat, h_b, h_0, times)

@@ -50,7 +50,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/recharge-models.html">recharge-models</a>
+      <a href="../articles/recharge-model-derivations.html">recharge-model-derivations</a>
     </li>
     <li>
       <a href="../articles/recharge-pit-geometries.html">recharge-pit-geometries</a>
@@ -113,9 +113,9 @@ as <code>units</code> objects. For example:</p>
 <span><span class="va">width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">4</span>, <span class="st">"ft"</span><span class="op">)</span></span>
 <span><span class="va">height</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html" class="external-link">set_units</a></span><span class="op">(</span><span class="fl">6</span>, <span class="st">"ft"</span><span class="op">)</span></span></code></pre></div>
 <p>Additionally, initial water content (<code>theta_0</code>), porosity
-(<code>theta_s</code>), saturated hydraulic conductivity (<code>Ksat</code>),
-and the time(s) at which the infiltration should be estimated
-(<code>times</code>).</p>
+(<code>theta_s</code>), saturated hydraulic conductivity
+(<code>Ksat</code>), and the time(s) at which the infiltration should be
+estimated (<code>times</code>).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">theta_0</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="co"># unitless</span></span>
 <span><span class="va">theta_s</span> <span class="op">&lt;-</span> <span class="fl">0.35</span> <span class="co"># unitless</span></span>
@@ -142,7 +142,7 @@ convert to volumes of recharge gives the final result.</p>
 <code class="sourceCode R"><span><span class="va">h_b</span> <span class="op">&lt;-</span> <span class="va">height</span></span>
 <span></span>
 <span><span class="co"># get horizontal flow:</span></span>
-<span><span class="va">Fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_horiz_flow_integrated.html">get_greenampt_horiz_flow_integrated</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, t <span class="op">=</span> <span class="va">times</span><span class="op">)</span></span>
+<span><span class="va">Fv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_horiz_flow_integrated.html">get_greenampt_horiz_flow_integrated</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, times <span class="op">=</span> <span class="va">times</span><span class="op">)</span></span>
 <span><span class="va">flow_horizontal</span> <span class="op">&lt;-</span> <span class="va">Fv</span> <span class="op">*</span> <span class="op">(</span><span class="va">width</span> <span class="op">*</span> <span class="fl">2</span> <span class="op">+</span> <span class="va">length</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fcum_vert</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_greenampt_flow_numerical.html">get_greenampt_flow_numerical</a></span><span class="op">(</span><span class="va">theta_0</span>, <span class="va">theta_s</span>, <span class="va">Ksat</span>, <span class="va">h_b</span>, <span class="va">h_0</span>, <span class="va">times</span><span class="op">)</span></span>

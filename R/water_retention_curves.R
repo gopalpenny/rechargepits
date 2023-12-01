@@ -7,7 +7,7 @@
 #' @param theta_r residual water content
 #' @param theta_s saturated water content
 #' @param alpha scaling parameter (reciprocal of air entry pressure, units of 1/length)
-#' @param theta_s curve shape, dimensionless
+#' @param gamma_s curve shape, dimensionless
 #' @export
 #' @details
 #' See:
@@ -22,14 +22,14 @@
 #' theta_r <- 0.15
 #' theta_s <- 0.25
 #' alpha <- set_units(0.008, "1/cm") # should have units of 1/length
-#' theta_s <- 10.4
-#' get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, theta_s)
-get_vg_hydraulic_head <- function(theta, theta_r, theta_s, alpha, theta_s) {
+#' gamma_s <- 10.4
+#' get_vg_hydraulic_head(theta, theta_r, theta_s, alpha, gamma_s)
+get_vg_hydraulic_head <- function(theta, theta_r, theta_s, alpha, gamma_s) {
   S <- (theta - theta_r) / (theta_s - theta_r)
 
-  m <- 1 - 1/theta_s
+  m <- 1 - 1/gamma_s
 
-  h <- -1/alpha * (S^(-1/m) - 1)^(1/theta_s)
+  h <- -1/alpha * (S^(-1/m) - 1)^(1/gamma_s)
 
   return(h)
 }
