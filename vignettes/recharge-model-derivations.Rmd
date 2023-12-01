@@ -1,5 +1,5 @@
 ---
-title: "recharge-models"
+title: "recharge-model-derivations"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{recharge-models}
