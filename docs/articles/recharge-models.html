@@ -102,6 +102,7 @@ below.</p>
 <div class="section level3">
 <h3 id="vertical-flow-green-ampt-equation">Vertical flow: Green-Ampt equation<a class="anchor" aria-label="anchor" href="#vertical-flow-green-ampt-equation"></a>
 </h3>
+<p><img src="../img/green-ampt-vertical.jpg" width="200px"></p>
 <p>To derive the Green-Ampt equation, we need to combine the following
 equations. First, Darcy flow:</p>
 <p><span class="math display">\[
@@ -177,7 +178,7 @@ follows, and plot the results.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">Fcum</span>, color <span class="op">=</span> <span class="va">group</span>, shape <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3</span>, stroke <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="recharge-models_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
+<p><img src="recharge-models_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="horizontal-flow-green-ampt-without-gravity">Horizontal flow: Green-Ampt without gravity<a class="anchor" aria-label="anchor" href="#horizontal-flow-green-ampt-without-gravity"></a>
@@ -185,13 +186,16 @@ follows, and plot the results.</p>
 <div class="section level4">
 <h4 id="horizontal-parallel-flow">Horizontal parallel flow<a class="anchor" aria-label="anchor" href="#horizontal-parallel-flow"></a>
 </h4>
+<p><img src="../img/green-ampt-horizontal.jpg" width="150px"></p>
 <p>This scenario is similar to Green-Ampt except that the flow occurs
 horizontally through a vertical surface. Darcy flow in this case can be
 calculated as: <span class="math display">\[
 q = K_{sat} \frac{h_b - h_0}{x_f},
 \]</span> where the only new variable is <span class="math inline">\(x_f\)</span>, the horizontal distance from the
-soil boundary to the wetting front. Note that <span class="math inline">\(x_f\)</span> is not present in the numerator. This
-equation becomes:</p>
+soil boundary to the wetting front. Note that cumulative infiltration is
+<span class="math inline">\(F = x_f \Delta \theta\)</span>. Also note
+that <span class="math inline">\(x_f\)</span> is not present in the
+numerator. This equation becomes:</p>
 <p><span class="math display">\[
 \frac{F}{\Delta \theta} \frac{\partial F}{\partial t} = K_{sat} (h_b -
 h_0).
@@ -222,7 +226,7 @@ infiltration using <code>get_greenampt_horiz_flow</code> and
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">Fcum</span>, color <span class="op">=</span> <span class="va">group</span>, shape <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3</span>, stroke <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="recharge-models_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
+<p><img src="recharge-models_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
 </div>
 <div class="section level4">
 <h4 id="horizontal-parallel-flow-integrated-over-a-depth">Horizontal parallel flow integrated over a depth<a class="anchor" aria-label="anchor" href="#horizontal-parallel-flow-integrated-over-a-depth"></a>
@@ -280,11 +284,12 @@ integrated flow over a differential depth (e.g., 1 mm):</p>
 <div class="section level4">
 <h4 id="horizontal-flow-through-a-cylinder">Horizontal flow through a cylinder<a class="anchor" aria-label="anchor" href="#horizontal-flow-through-a-cylinder"></a>
 </h4>
+<p><img src="../img/green-ampt-circular.jpg" width="200px"></p>
 <p>We now focus on horizontal flow (i.e., no gravity effect) radially
 outward through cylinder. In this case the goal is to calculate the
 radius of the wetting front (<span class="math inline">\(r_f\)</span>),
 from which the cumulative infiltration can be calculated at any time
-<span class="math inline">\(t\)</span> as <span class="math inline">\(F_r = \pi (r_f^2 - r_b^2)/\Delta \theta\)</span>,
+<span class="math inline">\(t\)</span> as <span class="math inline">\(F_r = \pi (r_f^2 - r_b^2) \Delta \theta\)</span>,
 where <span class="math inline">\(r_b\)</span> is the boundary of the
 recharge pit.</p>
 <p>We note that <span class="math inline">\(Q = 2 \pi r q(r)\)</span>
@@ -295,10 +300,9 @@ flow, we can plug this into Darcy’s law to obtain: <span class="math display">
 \]</span> Integrating this equation from <span class="math inline">\((r_b, h_b)\)</span> to <span class="math inline">\((r_f, h_0)\)</span>, we get: <span class="math display">\[
 Q = 2 \pi K_{sat} (h_b - h_0) \frac{1}{\ln (r_f / r_b)}
 \]</span></p>
-<p>We further note that <span class="math inline">\(\frac{\partial
-r_f}{\partial t} = \frac{Q}{2 \pi r_f \Delta \theta}\)</span>. Plugging
-in the equation for <span class="math inline">\(Q\)</span> and
-rearranging, we obtain: <span class="math display">\[
+<p>We further note that the propagation of the wetting front outward is
+directly related to <span class="math inline">\(Q\)</span> as <span class="math inline">\(\frac{\partial r_f}{\partial t} = \frac{Q}{2 \pi
+r_f \Delta \theta}\)</span>. Plugging in the equation for <span class="math inline">\(Q\)</span> and rearranging, we obtain: <span class="math display">\[
 r_f \ln(r_f / r_b) \partial r_f = \frac{1}{\Delta \theta }(h_b - h_0)
 \partial t
 \]</span> Integrating the two sides from <span class="math inline">\((t
@@ -315,13 +319,35 @@ t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln
 \frac{r_f}{r_b} - 1) \Big]
 \]</span> As noted above, it is straightforward to convert between <span class="math inline">\(F_r\)</span> and <span class="math inline">\(r_f\)</span>. Rearranging the equation, we have:
 <span class="math display">\[
-r_f = \sqrt{F_r \frac{\Delta \theta}{\pi} + r_b^2}
+r_f = \sqrt{ \frac{F_r}{\pi \Delta \theta} + r_b^2}
 \]</span></p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="spherical-flow-without-gravity">Spherical flow without gravity<a class="anchor" aria-label="anchor" href="#spherical-flow-without-gravity"></a>
+<h3 id="half-spherical-flow-without-gravity">Half-spherical flow without gravity<a class="anchor" aria-label="anchor" href="#half-spherical-flow-without-gravity"></a>
 </h3>
+<p>In this case we consider flow througha half spherical surface
+considering only pressure potentials and ignoring gravity. This model
+could potentially approximate 3-D infiltration through the bottom of a
+recharge pit in which the pressure head at the bottom of the pit large
+enough such that the gravity term is small. The approach to the
+derivation is similar to cylindrical flow, in that we first need to
+understand the hydraulic gradient as a function of <span class="math inline">\(r_f\)</span>, the radius to the wetting front. The
+surface area through which flow passes is <span class="math inline">\(2
+\pi r^2\)</span>, which half the surface area of a sphere (<span class="math inline">\(4 \pi r^2\)</span>). Because only pressure matters
+and flow is the same throughout the half-sphere, we can write Darcy’s
+law as: <span class="math display">\[
+\frac{Q}{2 \pi r^2} = -K_{sat} \frac{\partial h}{\partial r}.
+\]</span></p>
+<p>We integrate this equation from <span class="math inline">\((r_b,
+h_b)\)</span> to <span class="math inline">\((r_f, h_0)\)</span> and
+obtain: <span class="math display">\[
+\frac{Q}{2 \pi}\Big(\frac{1}{r_b} - \frac{1}{r_f}\Big) = K_{sat} (h_b -
+h_0)
+\]</span> Solving for <span class="math inline">\(Q\)</span>, we obtain:
+<span class="math display">\[
+Q = 2 \pi K_{sat} \Big(\frac{r_b r_f}{r_f - r_b}) (h_b - h_0)
+\]</span></p>
 </div>
 </div>
   </div>
