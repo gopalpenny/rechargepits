@@ -31,6 +31,10 @@ The building blocks of the pit recharge calculations are analytical equations si
 
 ## Vertical flow: Green-Ampt equation
 
+```{r, out.width = "200px", echo = FALSE}
+knitr::include_graphics("../img/green-ampt-vertical.jpg")
+```
+
 To derive the Green-Ampt equation, we need to combine the following equations. First, Darcy flow:
 
 $$
@@ -95,11 +99,15 @@ ggplot(df) +
 
 ### Horizontal parallel flow
 
+```{r, out.width = "150px", echo = FALSE}
+knitr::include_graphics("../img/green-ampt-horizontal.jpg")
+```
+
 This scenario is similar to Green-Ampt except that the flow occurs horizontally through a vertical surface. Darcy flow in this case can be calculated as:
 $$
 q = K_{sat} \frac{h_b - h_0}{x_f},
 $$
-where the only new variable is $x_f$, the horizontal distance from the soil boundary to the wetting front. Note that $x_f$ is not present in the numerator. This equation becomes:
+where the only new variable is $x_f$, the horizontal distance from the soil boundary to the wetting front. Note that cumulative infiltration is $F = x_f \Delta \theta$. Also note that $x_f$ is not present in the numerator. This equation becomes:
 
 $$
 \frac{F}{\Delta \theta} \frac{\partial F}{\partial t} = K_{sat} (h_b - h_0).
@@ -185,7 +193,11 @@ The percent error is `r round((Fv_point - F_point) / F_point * 100, 3)`\%.
 
 ### Horizontal flow through a cylinder
 
-We now focus on horizontal flow (i.e., no gravity effect) radially outward through cylinder. In this case the goal is to calculate the radius of the wetting front ($r_f$), from which the cumulative infiltration can be calculated at any time $t$ as $F_r = \pi (r_f^2 - r_b^2)/\Delta \theta$, where $r_b$ is the boundary of the recharge pit.
+```{r, out.width = "200px", echo = FALSE}
+knitr::include_graphics("../img/green-ampt-circular.jpg")
+```
+
+We now focus on horizontal flow (i.e., no gravity effect) radially outward through cylinder. In this case the goal is to calculate the radius of the wetting front ($r_f$), from which the cumulative infiltration can be calculated at any time $t$ as $F_r = \pi (r_f^2 - r_b^2) \Delta \theta$, where $r_b$ is the boundary of the recharge pit.
 
 We note that $Q = 2 \pi r q(r)$ and therefore $q = \frac{Q}{2 \pi r}$. Because $q$ is the Darcy flow, we can plug this into Darcy's law to obtain:
 $$
@@ -196,7 +208,7 @@ $$
 Q = 2 \pi K_{sat} (h_b - h_0) \frac{1}{\ln (r_f / r_b)}
 $$
 
-We further note that $\frac{\partial r_f}{\partial t} = \frac{Q}{2 \pi r_f \Delta \theta}$. Plugging in the equation for $Q$ and rearranging, we obtain:
+We further note that the propagation of the wetting front outward is directly related to $Q$ as $\frac{\partial r_f}{\partial t} = \frac{Q}{2 \pi r_f \Delta \theta}$. Plugging in the equation for $Q$ and rearranging, we obtain:
 $$
 r_f \ln(r_f / r_b) \partial r_f = \frac{1}{\Delta \theta }(h_b - h_0) \partial t
 $$
@@ -213,9 +225,22 @@ t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln \frac{r_f}{r_
 $$
 As noted above, it is straightforward to convert between $F_r$ and $r_f$. Rearranging the equation, we have:
 $$
-r_f = \sqrt{F_r \frac{\Delta \theta}{\pi} + r_b^2}
+r_f = \sqrt{ \frac{F_r}{\pi \Delta \theta} + r_b^2}
 $$
 
 
-## Spherical flow without gravity
+## Half-spherical flow without gravity
 
+In this case we consider flow througha half spherical surface considering only pressure potentials and ignoring gravity. This model could potentially approximate 3-D infiltration through the bottom of a recharge pit in which the pressure head at the bottom of the pit large enough such that the gravity term is small. The approach to the derivation is similar to cylindrical flow, in that we first need to understand the hydraulic gradient as a function of $r_f$, the radius to the wetting front. The surface area through which flow passes is $2 \pi r^2$, which half the surface area of a sphere ($4 \pi r^2$). Because only pressure matters and flow is the same throughout the half-sphere, we can write Darcy's law as:
+$$
+\frac{Q}{2 \pi r^2} = -K_{sat} \frac{\partial h}{\partial r}.
+$$
+
+We integrate this equation from $(r_b, h_b)$ to $(r_f, h_0)$ and obtain:
+$$
+\frac{Q}{2 \pi}\Big(\frac{1}{r_b} - \frac{1}{r_f}\Big) = K_{sat} (h_b - h_0)
+$$
+Solving for $Q$, we obtain:
+$$
+Q = 2 \pi K_{sat} \Big(\frac{r_b r_f}{r_f - r_b}) (h_b - h_0)
+$$

@@ -94,3 +94,6 @@ flow <- flow_horizontal + flow_vertical
 flow
 ```
 
+## Cylindrical pit with cylindrical and vertical flow
+
+Here the pit is represented by a radius and a depth. 
