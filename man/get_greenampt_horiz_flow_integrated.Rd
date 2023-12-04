@@ -55,14 +55,17 @@ Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 
-Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
+Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s,
+        Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
 
-# Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
+# Get infiltration over a 1 mm differential depth to compare with the point infiltration
+Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s,
+        Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
 Fv_point <- Fv_dv/ set_units(1, "mm")
 Fv_point
 # Get the point infiltration
-F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr")) \%>\% set_units("mm")
+F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0,
+        times = set_units(1,"hr")) \%>\% set_units("mm")
 F_point
 # percent error:
 (Fv_point - F_point) / F_point * 100

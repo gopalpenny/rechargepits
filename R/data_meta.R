@@ -24,7 +24,7 @@
 #' sand_rawls <- get_rawls_soil(soil_name = "Sandy loam")
 #' get_rawls_soil(soil_name = c("Sand","Sandy loam"))
 get_rawls_soil <- function(soil_name) {
-  all_soils <- rawls_soils
+  all_soils <- rechargepits::rawls_soils
   soil_rawls <- all_soils[all_soils$texture_class %in% soil_name,]
   if (nrow(soil_rawls) < 1) {
     stop("Invalid soil name: ", soil_name)

@@ -94,7 +94,7 @@ get_greenampt_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 #' # Double check that we get the original times back with the Green-Ampt equation
 #' set_units(get_greenampt_time(theta_0, theta_s, fcum, Ksat, h_b, h_0),"min")
 get_greenampt_flow_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, times) {
-  Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
+  Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function_name = "get_greenampt_time",
                                      theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 
   return(Fcum_vert)
@@ -134,8 +134,8 @@ get_greenampt_horiz_flow <- function(theta_0, theta_s, Ksat, h_b, h_0, times) {
 
   units::units_options(set_units_mode = "standard")
 
-  h_b <- set_units(h_b, units(Ksat)$numerator)
-  h_0 <- set_units(h_0, units(Ksat)$numerator)
+  h_b <- units::set_units(h_b, units(Ksat)$numerator)
+  h_0 <- units::set_units(h_0, units(Ksat)$numerator)
 
   Fcum <- sqrt(2 * dVWC * Ksat * (h_b - h_0) * times)
 
@@ -207,14 +207,17 @@ get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #'
-#' Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
+#' Fv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s,
+#'         Ksat, h_b, h_0, times = set_units(1,"hr"), d = NULL)
 #'
-#' # Get the infiltration over a 1 mm differential depth to compare with the point infiltration
-#' Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
+#' # Get infiltration over a 1 mm differential depth to compare with the point infiltration
+#' Fv_dv <- get_greenampt_horiz_flow_integrated(theta_0, theta_s,
+#'         Ksat, h_b, h_0, times = set_units(1,"hr"), d = set_units(1, "mm"))
 #' Fv_point <- Fv_dv/ set_units(1, "mm")
 #' Fv_point
 #' # Get the point infiltration
-#' F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0, times = set_units(1,"hr")) %>% set_units("mm")
+#' F_point <- get_greenampt_horiz_flow(theta_0, theta_s, Ksat, h_b, h_0,
+#'         times = set_units(1,"hr")) %>% set_units("mm")
 #' F_point
 #' # percent error:
 #' (Fv_point - F_point) / F_point * 100
@@ -231,16 +234,16 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
   dVWC <- theta_s - theta_0
   # h_diff <- h_b - h_0
 
-  t_num <- as.numeric(set_units(times, "h"))
+  t_num <- as.numeric(units::set_units(times, "h"))
 
-  Ksat_num <- as.numeric(set_units(Ksat, "cm/h"))
-  h_b_bottom_num <- as.numeric(set_units(h_b, "cm"))
-  h_b_top_num <- as.numeric(set_units(h_b, "cm") - set_units(d, "cm"))
-  h_0_num <- as.numeric(set_units(h_0, "cm"))
+  Ksat_num <- as.numeric(units::set_units(Ksat, "cm/h"))
+  h_b_bottom_num <- as.numeric(units::set_units(h_b, "cm"))
+  h_b_top_num <- as.numeric(units::set_units(h_b, "cm") - units::set_units(d, "cm"))
+  h_0_num <- as.numeric(units::set_units(h_0, "cm"))
 
   Fv_num <- sqrt(8/9 * dVWC * Ksat_num * t_num) * ((h_b_bottom_num - h_0_num)^(3/2) - (h_b_top_num-h_0_num)^(3/2))
-  Fv_cm2 <- set_units(Fv_num, "cm^2")
-  Fv <- set_units(Fv_cm2, units(units_obj))
+  Fv_cm2 <- units::set_units(Fv_num, "cm^2")
+  Fv <- units::set_units(Fv_cm2, units(units_obj))
 
   return(Fv)
 }

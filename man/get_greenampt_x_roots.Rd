@@ -10,6 +10,10 @@ get_greenampt_x_roots(times, x_units, green_ampt_function_name, ...)
 \item{times}{Times to calculate total infiltration}
 
 \item{x_units}{Units for output variable}
+
+\item{green_ampt_function_name}{Name of function to use in root finding}
+
+\item{...}{Parameters passed to the function named by `green_ampt_function`}
 }
 \description{
 Get green ampt roots
@@ -23,9 +27,11 @@ Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
-times <- set_units(1:60, "min")
-Fcum_horiz <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_horiz_time",
+times <- set_units(seq(10,60, by = 5), "min")
+Fcum_horiz <- get_greenampt_x_roots(times = times, x_units = "mm",
+   green_ampt_function = "get_greenampt_horiz_time",
    theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0)
-Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm", green_ampt_function = "get_greenampt_time",
+Fcum_vert <- get_greenampt_x_roots(times = times, x_units = "mm",
+   green_ampt_function = "get_greenampt_time",
    theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 }
