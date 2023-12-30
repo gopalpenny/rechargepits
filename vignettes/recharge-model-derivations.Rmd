@@ -261,7 +261,7 @@ $$
 
 ## Half-spherical flow without gravity
 
-In this case we consider flow througha half spherical surface considering only pressure potentials and ignoring gravity. This model could potentially approximate 3-D infiltration through the bottom of a recharge pit in which the pressure head at the bottom of the pit large enough such that the gravity term is small. The approach to the derivation is similar to cylindrical flow, in that we first need to understand the hydraulic gradient as a function of $r_f$, the radius to the wetting front. The surface area through which flow passes is $2 \pi r^2$, which half the surface area of a sphere ($4 \pi r^2$). Because only pressure matters and flow is the same throughout the half-sphere, we can write Darcy's law as:
+In this case we consider flow through a half spherical surface considering only pressure potentials and ignoring gravity. This model could potentially approximate 3-D infiltration through the bottom of a recharge pit in which the pressure head at the bottom of the pit large enough such that the gravity term is small. The approach to the derivation is similar to cylindrical flow, in that we first need to understand the hydraulic gradient as a function of $r_f$, the radius to the wetting front. The surface area through which flow passes is $2 \pi r^2$, which is half the surface area of a sphere ($4 \pi r^2$). Because only pressure matters and flow is the same throughout the half-sphere, we can write Darcy's law as:
 $$
 \frac{Q}{2 \pi r^2} = -K_{sat} \frac{\partial h}{\partial r}.
 $$
@@ -273,4 +273,23 @@ $$
 Solving for $Q$, we obtain:
 $$
 Q = 2 \pi K_{sat} \Big(\frac{r_b r_f}{r_f - r_b} \Big) (h_b - h_0)
+$$
+
+Now that we have $Q$ as a function of $r_f$, we can focus on determining how $r_f$ changes over time. The propagation of $r_f$ is simply the total outward flow $Q$ divided by the surface area of the half sphere $2 \pi r^2$, divided by the available soil storage $\Delta \theta = \theta_s - \theta_0$. In other words:
+$$
+\frac{\partial r_f}{\partial t} = \frac{Q}{2 \pi r^2 \Delta \theta} \, .
+$$
+Plugging in for $Q$ and rearranging terms, we get:
+$$
+\frac{1}{r_b} \Big[ r_f^2 - r_b r_f \Big] \partial r_f = \frac{K_{sat}}{\Delta \theta} \Big[ h_b - h_0 \Big] \partial t \,.
+$$
+
+We can then integrate from $(r_b, 0)$ to $(r_f, t)$ to obtain:
+$$
+\frac{1}{r_b} \Big( \frac{1}{3} r_f^3 - \frac{r_b}{2} r_f^2 \Big) \Bigg|_{r_b}^{r_f} = \frac{K_{sat}}{\Delta \theta} \Big( h_b - h_0 \Big) t \, \Bigg|_0^t
+$$
+
+Plugging in values and solving for $t$, we finally obtain:
+$$
+t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
 $$
