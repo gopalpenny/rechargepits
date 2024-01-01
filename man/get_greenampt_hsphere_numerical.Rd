@@ -42,17 +42,21 @@ surface into a soil profile. Flow is driven by pressure only and gravity
 is ignored. This might mimic a situation of subsurface recharge where the
 pressure head gradient is significantly larger than the elevation head
 gradient. Otherwise, the assumptions are the same as in the Green-Ampt
-equation. The equations to calculate the time required to achieve
-some quantum of recharge are:
-$$
-t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
-$$
+equation. The equation includes
+\eqn{r_f}, which is the radius to the edge of the front from the center of the
+sphere. The equation to calculate the time required to achieve
+some quantum of recharge is:
 
-This function uses a numerical solver to obtain r_f at times t,
-then converts these values to F_s using the equation:
-$$
-F_s = \Delta \theta \pi \frac{2}{3}\Big(  r_f^3 - r_b^3 \Big)
-$$
+\deqn{t = \frac{\Delta \theta}{K_{sat} (h_b - h_0)}  \Bigg[ \frac{r_f^3}{3 r_b}  - \frac{r_f^2}{2} + \frac{r_b^2}{6} \Bigg]}
+
+It is straightforward to convert between cumulative infiltration \eqn{F_c}
+and \eqn{r_f}:
+
+\deqn{F_s = \Delta \theta \pi \frac{2}{3}\Big( r_f^3 - r_b^3 \Big)}
+
+and
+
+\deqn{r_f = \Big( \frac{3 F_s}{2 \Delta \theta \pi} + r_b^3 \Big)^{1/3}}
 }
 \examples{
 

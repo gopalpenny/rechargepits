@@ -322,7 +322,7 @@ $$
 
 The volume of a half sphere is equal to $V_s(r) = 2/3 \pi r^3$. Therefore we can determine the amount of infiltration as $F_s = \Delta \theta (V_s(r_f) - V_s(r_b))$, or:
 $$
-F_s = \Delta \theta \pi \frac{2}{3}\Big(  r_f^3 - r_b^3 \Big)
+F_s = \Delta \theta \pi \frac{2}{3}\Big( r_f^3 - r_b^3 \Big)
 $$
 Conversely, we can calculate $r_f$ from $F_s$ as:
 $$

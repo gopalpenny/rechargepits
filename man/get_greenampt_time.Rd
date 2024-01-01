@@ -36,7 +36,7 @@ assumptions are:
 With these assumptions, the amount of time for a particular infiltration depth (Fcum)
 can be calculated using Darcy's law as:
 
-$$t = 1/Ksat * (Fcum - (theta_s - theta_0)(h_b - h_0) * ln(1 + Fcum / ((theta_s - theta_0)(h_b - h_))))$
+\deqn{t = \frac{1}{K_{sat}}\Big[F - \Delta \theta (h_b - h_0) \ln (1 + \frac{F}{\Delta \theta (h_b - h_0)}) \Big]}
 }
 \examples{
 

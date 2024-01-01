@@ -33,18 +33,27 @@ get_greenampt_cyl_horiz_numerical(
 \item{F_units}{character indicating the areal (L^2) `units` for the output}
 }
 \value{
-Returns the time at which a cumulative amount of
-infiltration occurs.
+Returns the cumulative amount of
+infiltration after time `times`.
 }
 \description{
 This function models saturated outward radial flow from a circular saturated
 surface horizontally into a soil profile. The assumptions are the same as
 in the Green-Ampt equation, except that there is no effect of
-gravity because all flow is assumed to be horizontal. The equation is:
+gravity because all flow is assumed to be horizontal. The equation includes
+\eqn{r_f}, which is the radius to the edge of the front from the center of the
+cylinder:
 
-$$F^2$$
-$$F^2$$
-$$F^2$$
+\deqn{t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln \frac{r_f}{r_b} - 1) \Big]}
+
+It is straightforward to convert between cumulative infiltratioj \eqn{F_c}
+and \eqn{r_f}:
+
+\deqn{F_c = \pi (r_f^2 - r_b^2) \Delta \theta}
+
+and the reverse:
+
+\deqn{r_f = \sqrt{ \frac{F_c}{\pi \Delta \theta} + r_b^2}}
 }
 \examples{
 

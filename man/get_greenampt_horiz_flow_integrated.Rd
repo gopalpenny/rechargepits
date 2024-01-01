@@ -42,9 +42,7 @@ further integrates over the vertical depth of a pit such that
 the hydraulic head at the boundary goes from (h_b - thickness) to h_b.
 The equation is:
 
-$$F^2$$
-$$F^2$$
-$$F^2$$
+\deqn{F_v = \sqrt{\frac{8}{9} \Delta \theta K_{sat} t} \Big[(h_b - h_0)^{3/2} - (h_b - d - h_0)^{3/2} \Big]}
 }
 \examples{
 

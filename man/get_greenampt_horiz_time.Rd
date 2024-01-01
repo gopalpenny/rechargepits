@@ -29,9 +29,7 @@ surface into a soil profile. The assumptions are the same as
 in the Green-Ampt equation, except that there is no effect of
 gravity because all flow is assumed to be horizontal. The equation is:
 
-$$F^2$$
-$$F^2$$
-$$F^2$$
+\deqn{t = \frac{F^2}{2 \Delta \theta K_{sat} (h_b - h_0)}}
 }
 \examples{
 

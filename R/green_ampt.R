@@ -23,7 +23,7 @@
 #' With these assumptions, the amount of time for a particular infiltration depth (Fcum)
 #' can be calculated using Darcy's law as:
 #'
-#' $$t = 1/Ksat * (Fcum - (theta_s - theta_0)(h_b - h_0) * ln(1 + Fcum / ((theta_s - theta_0)(h_b - h_))))$
+#' \deqn{t = \frac{1}{K_{sat}}\Big[F - \Delta \theta (h_b - h_0) \ln (1 + \frac{F}{\Delta \theta (h_b - h_0)}) \Big]}
 #'
 #' @returns Returns the time at which a cumulative amount of
 #' infiltration occurs.
@@ -73,7 +73,7 @@ get_greenampt_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 #' With these assumptions, the amount of time for a particular infiltration depth (Fcum)
 #' can be calculated using Darcy's law as:
 #'
-#' $$t = 1/Ksat * (Fcum - (theta_s - theta_0)(h_b - h_0) * ln(1 + Fcum / ((theta_s - theta_0)(h_b - h_))))$$
+#' \deqn{t = \frac{1}{K_{sat}}\Big[F - \Delta \theta (h_b - h_0) \ln (1 + \frac{F}{\Delta \theta (h_b - h_0)}) \Big]}
 #'
 #' The cumulative infiltration is then found using a numerical root solver,
 #' `uniroot`.
@@ -101,6 +101,37 @@ get_greenampt_flow_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, times
 }
 
 
+#' Green-Ampt horizontal flow time
+#'
+#'
+#' @inheritParams get_greenampt_time
+#' @export
+#' @description
+#' This function models saturated horizontal flow from a saturated
+#' surface into a soil profile. The assumptions are the same as
+#' in the Green-Ampt equation, except that there is no effect of
+#' gravity because all flow is assumed to be horizontal. The equation is:
+#'
+#' \deqn{t = \frac{F^2}{2 \Delta \theta K_{sat} (h_b - h_0)}}
+#' @returns Returns the time at which a cumulative amount of
+#' infiltration occurs.
+#' @examples
+#'
+#' library(units)
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
+#' Fcum <- set_units(20, "mm") # depth
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
+get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
+  dVWC = theta_s - theta_0
+
+  t = 1/2 * Fcum^2 / (dVWC * Ksat * (h_b - h_0))
+
+  return(t)
+}
 
 #' Green-Ampt horizontal flow
 #'
@@ -113,9 +144,7 @@ get_greenampt_flow_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, times
 #' in the Green-Ampt equation, except that there is no effect of
 #' gravity because all flow is assumed to be horizontal. The equation is:
 #'
-#' $$F^2$$
-#' $$F^2$$
-#' $$F^2$$
+#' \deqn{F = \sqrt{2 \Delta \theta K_{sat} (h_b - h_0) t}}
 #' @returns Returns the cumulative infiltration at the specified times
 #' @examples
 #'
@@ -143,41 +172,6 @@ get_greenampt_horiz_flow <- function(theta_0, theta_s, Ksat, h_b, h_0, times) {
 }
 
 
-#' Green-Ampt horizontal flow time
-#'
-#'
-#' @inheritParams get_greenampt_time
-#' @export
-#' @description
-#' This function models saturated horizontal flow from a saturated
-#' surface into a soil profile. The assumptions are the same as
-#' in the Green-Ampt equation, except that there is no effect of
-#' gravity because all flow is assumed to be horizontal. The equation is:
-#'
-#' $$F^2$$
-#' $$F^2$$
-#' $$F^2$$
-#' @returns Returns the time at which a cumulative amount of
-#' infiltration occurs.
-#' @examples
-#'
-#' library(units)
-#' theta_0 <- 0.2 # unitless
-#' theta_s <- 0.35 # unitless
-#' Fcum <- set_units(20, "mm") # depth
-#' Ksat <- set_units(0.2, "cm/h") # length / time
-#' h_b <- set_units(6, "ft") # hydraulic head (length)
-#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' times <- get_greenampt_horiz_time(theta_0, theta_s, Fcum, Ksat, h_b, h_0)
-get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
-  dVWC = theta_s - theta_0
-
-  t = 1/2 * Fcum^2 / (dVWC * Ksat * (h_b - h_0))
-
-  return(t)
-}
-
-
 
 #' Horizontal Green-Ampt flow integrated
 #'
@@ -193,9 +187,7 @@ get_greenampt_horiz_time <- function(theta_0, theta_s, Fcum, Ksat, h_b, h_0) {
 #' the hydraulic head at the boundary goes from (h_b - thickness) to h_b.
 #' The equation is:
 #'
-#' $$F^2$$
-#' $$F^2$$
-#' $$F^2$$
+#' \deqn{F_v = \sqrt{\frac{8}{9} \Delta \theta K_{sat} t} \Big[(h_b - h_0)^{3/2} - (h_b - d - h_0)^{3/2} \Big]}
 #' @returns Returns the time at which a cumulative amount of
 #' infiltration occurs.
 #' @examples
@@ -261,11 +253,21 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
 #' This function models saturated outward radial flow from a circular saturated
 #' surface horizontally into a soil profile. The assumptions are the same as
 #' in the Green-Ampt equation, except that there is no effect of
-#' gravity because all flow is assumed to be horizontal. The equation is:
+#' gravity because all flow is assumed to be horizontal. The equation includes
+#' \eqn{r_f}, which is the radius to the edge of the front from the center of the
+#' cylinder:
 #'
-#' $$F^2$$
-#' $$F^2$$
-#' $$F^2$$
+#' \deqn{t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln \frac{r_f}{r_b} - 1) \Big]}
+#'
+#' It is straightforward to convert between cumulative infiltration \eqn{F_c}
+#' and \eqn{r_f}:
+#'
+#' \deqn{F_c = \pi (r_f^2 - r_b^2) \Delta \theta}
+#'
+#' and the reverse:
+#'
+#' \deqn{r_f = \sqrt{ \frac{F_c}{\pi \Delta \theta} + r_b^2}}
+#'
 #' @returns Returns the time at which a cumulative amount of
 #' infiltration occurs.
 #' @examples
@@ -301,13 +303,23 @@ get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_c, Ksat, h_b, h_0, 
 #' This function models saturated outward radial flow from a circular saturated
 #' surface horizontally into a soil profile. The assumptions are the same as
 #' in the Green-Ampt equation, except that there is no effect of
-#' gravity because all flow is assumed to be horizontal. The equation is:
+#' gravity because all flow is assumed to be horizontal. The equation includes
+#' \eqn{r_f}, which is the radius to the edge of the front from the center of the
+#' cylinder:
 #'
-#' $$F^2$$
-#' $$F^2$$
-#' $$F^2$$
-#' @returns Returns the time at which a cumulative amount of
-#' infiltration occurs.
+#' \deqn{t = \frac{\Delta \theta}{4 (h_b - h_0)} \Big[r_b^2 + r_f^2 (2  \ln \frac{r_f}{r_b} - 1) \Big]}
+#'
+#' It is straightforward to convert between cumulative infiltratioj \eqn{F_c}
+#' and \eqn{r_f}:
+#'
+#' \deqn{F_c = \pi (r_f^2 - r_b^2) \Delta \theta}
+#'
+#' and the reverse:
+#'
+#' \deqn{r_f = \sqrt{ \frac{F_c}{\pi \Delta \theta} + r_b^2}}
+#'
+#' @returns Returns the cumulative amount of
+#' infiltration after time `times`.
 #' @examples
 #'
 #' library(units)
@@ -341,21 +353,28 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 #' @param F_s cumulative radial infiltration through the cylinder (units of volume or L^3)
 #' @export
 #' @description
+#'
 #' This function models saturated flow from a wetted half-spherical
 #' surface into a soil profile. Flow is driven by pressure only and gravity
 #' is ignored. This might mimic a situation of subsurface recharge where the
 #' pressure head gradient is significantly larger than the elevation head
 #' gradient. Otherwise, the assumptions are the same as in the Green-Ampt
-#' equation. The equations to calculate the time required to achieve
-#' some quantum of recharge are:
+#' equation. The equation includes
+#' \eqn{r_f}, which is the radius to the edge of the front from the center of the
+#' sphere. The equation to calculate the time required to achieve
+#' some quantum of recharge is:
 #'
-#' $$
-#' r_f = \Big( \frac{3 F_s}{2 \Delta \theta \pi} + r_b^3 \Big)^{1/3}
-#' $$
+#' \deqn{t = \frac{\Delta \theta}{K_{sat} (h_b - h_0)}  \Bigg[ \frac{r_f^3}{3 r_b}  - \frac{r_f^2}{2} + \frac{r_b^2}{6} \Bigg]}
+#'
+#' It is straightforward to convert between cumulative infiltration \eqn{F_c}
+#' and \eqn{r_f}:
+#'
+#' \deqn{F_s = \Delta \theta \pi \frac{2}{3}\Big( r_f^3 - r_b^3 \Big)}
+#'
 #' and
-#' $$
-#' t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
-#' $$
+#'
+#' \deqn{r_f = \Big( \frac{3 F_s}{2 \Delta \theta \pi} + r_b^3 \Big)^{1/3}}
+#'
 #' @returns Returns the time at which a cumulative amount of volumetric
 #' infiltration occurs through the half sphere.
 #' @examples
@@ -395,17 +414,22 @@ get_greenampt_hsphere_time <- function(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_
 #' is ignored. This might mimic a situation of subsurface recharge where the
 #' pressure head gradient is significantly larger than the elevation head
 #' gradient. Otherwise, the assumptions are the same as in the Green-Ampt
-#' equation. The equations to calculate the time required to achieve
-#' some quantum of recharge are:
-#' $$
-#' t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
-#' $$
+#' equation. The equation includes
+#' \eqn{r_f}, which is the radius to the edge of the front from the center of the
+#' sphere. The equation to calculate the time required to achieve
+#' some quantum of recharge is:
 #'
-#' This function uses a numerical solver to obtain r_f at times t,
-#' then converts these values to F_s using the equation:
-#' $$
-#' F_s = \Delta \theta \pi \frac{2}{3}\Big(  r_f^3 - r_b^3 \Big)
-#' $$
+#' \deqn{t = \frac{\Delta \theta}{K_{sat} (h_b - h_0)}  \Bigg[ \frac{r_f^3}{3 r_b}  - \frac{r_f^2}{2} + \frac{r_b^2}{6} \Bigg]}
+#'
+#' It is straightforward to convert between cumulative infiltration \eqn{F_c}
+#' and \eqn{r_f}:
+#'
+#' \deqn{F_s = \Delta \theta \pi \frac{2}{3}\Big( r_f^3 - r_b^3 \Big)}
+#'
+#' and
+#'
+#' \deqn{r_f = \Big( \frac{3 F_s}{2 \Delta \theta \pi} + r_b^3 \Big)^{1/3}}
+#'
 #' @returns Returns the cumulative amount of volumetric
 #' infiltration occurs through the half sphere.
 #' @examples
