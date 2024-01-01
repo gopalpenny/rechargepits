@@ -344,6 +344,78 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
   return(F_c_cum)
 }
 
+#' Get greenampt cylindrical flow integrated
+#'
+#' @param d Depth over which to be integrated. If NULL, set to h_b
+#' @param num_sections Number of discrete bins over which to calculate recharge
+#' @export
+#' @description
+#' This function calculates green-ampt cylindrical flow (using
+#' `get_greenampt_cyl_horiz_numerical`) over a number of discrete vertical sections. This
+#' allows calculation of volumetric flow moving horizontally outward from a vertical,
+#' cylindrical pit filled with water. For instance, consider an idealized example of
+#' a cylindrical recharge well with a radius of 2 ft (`r_b`), a depth of 4 ft (`h_b`), screened over
+#' the bottom 3 ft (`d`). In this case, we might specify `num_sections = 3`, in which case
+#' this function would estimate planar radial flow (\exp{F_r}) using `get_greenampt_cyl_horiz_numerical` with
+#' \eqn{h_b \in \{1.5, 2.5, 3.5 ft\}}. Then the volumetric flow would be estimated as:
+#'
+#' \deqn{F_{c,total} = 1 ft \ times (F_r |_{h_b = 1.5} + F_r |_{h_b = 2.5} + F_r |_{h_b = 3.5})}
+#'
+#' The \eqn{1 ft} at the front represents the width of each section.
+#'
+#' @return
+#' This function returns cumulative volumetric infiltration.
+#' @examples
+#' library(units)
+#' r_b <- set_units(2, "ft") # length
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
+#' times <- set_units(c(0, 0.5, 1, 5), "hr")
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(4, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' d <- set_units(3, "ft")
+#' num_sections <- 3
+#' # times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b)
+#' F_c_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2")
+#' F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2", num_sections = 3, d = d)
+#'
+#' # This is equivalent to a discretized version of `get_greenampt_cyl_horiz_numerical`:
+#' Fc_1_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(1.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_2_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(2.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_3_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(3.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_sum <- d / num_sections * (Fc_1_5 + Fc_2_5 + Fc_3_5)
+#' F_v_cum
+#' Fc_sum
+get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2", num_sections = 5, d = NULL) {
+  if (is.null(d)) {
+    d <- h_b
+  }
+  num_iter <- length(times) * num_sections
+  if (num_iter > 20) {
+    pbtrue <- TRUE
+    pb <- txtProgressBar(max = num_sections)
+  } else{
+    pbtrue <- FALSE
+  }
+  section_width <- d / num_sections
+  section_centers <- (h_b - d - section_width/2) + (section_width) * 1:num_sections
+  for (i in 1:length(section_centers)) {
+    # i <- 1
+    h_b_i <- section_centers[i]
+    F_v_i <- section_width * get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b_i, h_0, r_b, times, F_units = "ft^2")
+
+    if (i == 1) {
+      F_v_cum <- F_v_i
+    } else {
+      F_v_cum <- F_v_cum + F_v_i
+    }
+    if (pbtrue) {
+      setTxtProgressBar(pb, i)
+    }
+  }
+  return(F_v_cum)
+}
 
 
 #' Green-Ampt half-spherical pressure flow time

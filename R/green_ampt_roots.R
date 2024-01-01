@@ -56,5 +56,3 @@ get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...)
   }
   return(x)
 }
-
-# get_greenampt_cyl_flow <-
