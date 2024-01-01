@@ -1,8 +1,8 @@
 ---
-title: "recharge-model-derivations"
+title: "green-ampt-derivations"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{recharge-model-derivations}
+  %\VignetteIndexEntry{green-ampt-derivations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(rechargepits)
 ```
 
-# Recharge model derivations
+# Green-ampt derivations
 
 This packages provides analytical and root-finding methods for calculating groundwater recharge under specific geometries. In each case, the models follow assumptions used in the Green-Ampt method:
 
