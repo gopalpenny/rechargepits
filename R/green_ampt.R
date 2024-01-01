@@ -331,7 +331,8 @@ get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_c, Ksat, h_b, h_0, 
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b)
-#' F_c_calculated <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2")
+#' F_c_calculated <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b, h_0,
+#'                                                     r_b, times, F_units = "ft^2")
 get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2") {
   units::units_options(set_units_mode = "standard")
 
@@ -346,6 +347,7 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 
 #' Get greenampt cylindrical flow integrated
 #'
+#' @inheritParams get_greenampt_cyl_horiz_numerical
 #' @param d Depth over which to be integrated. If NULL, set to h_b
 #' @param num_sections Number of discrete bins over which to calculate recharge
 #' @export
@@ -356,7 +358,7 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 #' cylindrical pit filled with water. For instance, consider an idealized example of
 #' a cylindrical recharge well with a radius of 2 ft (`r_b`), a depth of 4 ft (`h_b`), screened over
 #' the bottom 3 ft (`d`). In this case, we might specify `num_sections = 3`, in which case
-#' this function would estimate planar radial flow (\exp{F_r}) using `get_greenampt_cyl_horiz_numerical` with
+#' this function would estimate planar radial flow (\eqn{F_r}) using `get_greenampt_cyl_horiz_numerical` with
 #' \eqn{h_b \in \{1.5, 2.5, 3.5 ft\}}. Then the volumetric flow would be estimated as:
 #'
 #' \deqn{F_{c,total} = 1 ft \ times (F_r |_{h_b = 1.5} + F_r |_{h_b = 2.5} + F_r |_{h_b = 3.5})}
@@ -376,14 +378,16 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' d <- set_units(3, "ft")
 #' num_sections <- 3
-#' # times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b)
-#' F_c_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2")
-#' F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2", num_sections = 3, d = d)
+#' F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times,
+#'                                              F_units = "ft^2", num_sections = 3, d = d)
 #'
 #' # This is equivalent to a discretized version of `get_greenampt_cyl_horiz_numerical`:
-#' Fc_1_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(1.5,"ft"), h_0, r_b, times, F_units = "ft^2")
-#' Fc_2_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(2.5,"ft"), h_0, r_b, times, F_units = "ft^2")
-#' Fc_3_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b = set_units(3.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_1_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat,
+#'                 h_b = set_units(1.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_2_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat,
+#'                 h_b = set_units(2.5,"ft"), h_0, r_b, times, F_units = "ft^2")
+#' Fc_3_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat,
+#'                 h_b = set_units(3.5,"ft"), h_0, r_b, times, F_units = "ft^2")
 #' Fc_sum <- d / num_sections * (Fc_1_5 + Fc_2_5 + Fc_3_5)
 #' F_v_cum
 #' Fc_sum
@@ -394,7 +398,7 @@ get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, 
   num_iter <- length(times) * num_sections
   if (num_iter > 20) {
     pbtrue <- TRUE
-    pb <- txtProgressBar(max = num_sections)
+    pb <- utils::txtProgressBar(max = num_sections)
   } else{
     pbtrue <- FALSE
   }
@@ -411,7 +415,7 @@ get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, 
       F_v_cum <- F_v_cum + F_v_i
     }
     if (pbtrue) {
-      setTxtProgressBar(pb, i)
+      utils::setTxtProgressBar(pb, i)
     }
   }
   return(F_v_cum)
@@ -515,8 +519,8 @@ get_greenampt_hsphere_time <- function(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
 #' times <- get_greenampt_hsphere_time(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_b)
-#' F_s_calculated <- get_greenampt_hsphere_numerical(theta_0, theta_s, times, Ksat, h_b, h_0, r_b)
-#' F_s_calculated
+#' F_s_calc <- get_greenampt_hsphere_numerical(theta_0, theta_s, Ksat, h_b, h_0, r_b, times)
+#' F_s_calc
 get_greenampt_hsphere_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^3") {
   units::units_options(set_units_mode = "standard")
   units_check <- units::set_units(1, F_units)

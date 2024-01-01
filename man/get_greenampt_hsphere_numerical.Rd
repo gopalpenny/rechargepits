@@ -69,6 +69,6 @@ Ksat <- set_units(0.2, "cm/h") # length / time
 h_b <- set_units(6, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 times <- get_greenampt_hsphere_time(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_b)
-F_s_calculated <- get_greenampt_hsphere_numerical(theta_0, theta_s, times, Ksat, h_b, h_0, r_b)
-F_s_calculated
+F_s_calc <- get_greenampt_hsphere_numerical(theta_0, theta_s, Ksat, h_b, h_0, r_b, times)
+F_s_calc
 }
