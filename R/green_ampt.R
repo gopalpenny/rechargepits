@@ -255,11 +255,11 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
 #'
 #' @inheritParams get_greenampt_time
 #' @param r_b radius from the centroid to the free water--soil boundary
-#' @param F_r cumulative radial infiltration through the cylinder (units of L^2)
+#' @param F_c cumulative radial infiltration through the cylinder (units of area or L^2)
 #' @export
 #' @description
-#' This function models saturated horizontal flow from a saturated
-#' surface into a soil profile. The assumptions are the same as
+#' This function models saturated outward radial flow from a circular saturated
+#' surface horizontally into a soil profile. The assumptions are the same as
 #' in the Green-Ampt equation, except that there is no effect of
 #' gravity because all flow is assumed to be horizontal. The equation is:
 #'
@@ -274,15 +274,15 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
 #' r_b <- set_units(2, "ft") # length
 #' theta_0 <- 0.2 # unitless
 #' theta_s <- 0.35 # unitless
-#' F_r <- set_units(10, "ft^2") # units of length^2
+#' F_c <- set_units(10, "ft^2") # units of length^2
 #' Ksat <- set_units(0.2, "cm/h") # length / time
 #' h_b <- set_units(6, "ft") # hydraulic head (length)
 #' h_0 <- set_units(-10, "cm") # hydraulic head (length)
-#' times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b)
-get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_r, Ksat, h_b, h_0, r_b) {
+#' times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b)
+get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b) {
   dVWC <- theta_s - theta_0
 
-  r_f <- sqrt(F_r * dVWC / pi + r_b^2)
+  r_f <- sqrt(F_c * dVWC / pi + r_b^2)
 
   t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + 2 * r_f^2 * as.numeric(log(r_f/r_b)) - r_f^2)
   # t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + r_f^2 * (2 * as.numeric(log(r_f/r_b)) - 1))
@@ -290,5 +290,144 @@ get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_r, Ksat, h_b, h_0, 
   return(t)
 }
 
+#' Green-Ampt cylindrical horizontal flow
+#'
+#'
+#' @inheritParams get_greenampt_cyl_horiz_time
+#' @param times times at which to calculate cumulative infiltration
+#' @param F_units character indicating the areal (L^2) `units` for the output
+#' @export
+#' @description
+#' This function models saturated outward radial flow from a circular saturated
+#' surface horizontally into a soil profile. The assumptions are the same as
+#' in the Green-Ampt equation, except that there is no effect of
+#' gravity because all flow is assumed to be horizontal. The equation is:
+#'
+#' $$F^2$$
+#' $$F^2$$
+#' $$F^2$$
+#' @returns Returns the time at which a cumulative amount of
+#' infiltration occurs.
+#' @examples
+#'
+#' library(units)
+#' r_b <- set_units(2, "ft") # length
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
+#' F_c <- set_units(c(1, 5, 10, 20), "ft^2") # units of length^2
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b)
+#' F_c_calculated <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2")
+get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2") {
+  units::units_options(set_units_mode = "standard")
 
+  units_check <- units::set_units(1, F_units)
+  units_check <- units::set_units(units_check, "m^2") # check to ensure units are L^2
+
+  F_c_cum <- get_greenampt_x_roots(times = times, x_units = F_units, green_ampt_function_name = "get_greenampt_cyl_horiz_time",
+                                   theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0, r_b = r_b)
+
+  return(F_c_cum)
+}
+
+
+
+#' Green-Ampt half-spherical pressure flow time
+#'
+#'
+#' @inheritParams get_greenampt_cyl_horiz_time
+#' @param F_s cumulative radial infiltration through the cylinder (units of volume or L^3)
+#' @export
+#' @description
+#' This function models saturated flow from a wetted half-spherical
+#' surface into a soil profile. Flow is driven by pressure only and gravity
+#' is ignored. This might mimic a situation of subsurface recharge where the
+#' pressure head gradient is significantly larger than the elevation head
+#' gradient. Otherwise, the assumptions are the same as in the Green-Ampt
+#' equation. The equations to calculate the time required to achieve
+#' some quantum of recharge are:
+#'
+#' $$
+#' r_f = \Big( \frac{3 F_s}{2 \Delta \theta \pi} + r_b^3 \Big)^{1/3}
+#' $$
+#' and
+#' $$
+#' t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
+#' $$
+#' @returns Returns the time at which a cumulative amount of volumetric
+#' infiltration occurs through the half sphere.
+#' @examples
+#'
+#' library(units)
+#' r_b <- set_units(2, "ft") # length
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
+#' F_s <- set_units(10, "ft^3") # units of length^2
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- get_greenampt_hsphere_time(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_b)
+get_greenampt_hsphere_time <- function(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_b) {
+  dVWC <- theta_s - theta_0
+
+  r_f <- (3 * F_s / (2 * dVWC * pi) + r_b^3)^(1/3)
+
+  t <- dVWC / (Ksat * (h_b - h_0)) * (r_f^3/(3*r_b) - r_f^2/2 + r_b^2/6)
+  # t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + r_f^2 * (2 * as.numeric(log(r_f/r_b)) - 1))
+
+  return(t)
+}
+
+
+
+#' Green-Ampt half-spherical pressure flow
+#'
+#'
+#' @inheritParams get_greenampt_hsphere_time
+#' @param times times at which to calculate cumulative infiltration
+#' @param F_units character indicating the volumetric (L^3) `units` for the output
+#' @export
+#' @description
+#' This function models saturated flow from a wetted half-spherical
+#' surface into a soil profile. Flow is driven by pressure only and gravity
+#' is ignored. This might mimic a situation of subsurface recharge where the
+#' pressure head gradient is significantly larger than the elevation head
+#' gradient. Otherwise, the assumptions are the same as in the Green-Ampt
+#' equation. The equations to calculate the time required to achieve
+#' some quantum of recharge are:
+#' $$
+#' t = \frac{\Delta \theta}{K_{sat}} \Big( \frac{1}{h_b - h_0} \Big) \Bigg[ \frac{1}{3 r_b} r_f^3 - \frac{1}{2}r_f^2 + \frac{r_b^2}{6} \Bigg]
+#' $$
+#'
+#' This function uses a numerical solver to obtain r_f at times t,
+#' then converts these values to F_s using the equation:
+#' $$
+#' F_s = \Delta \theta \pi \frac{2}{3}\Big(  r_f^3 - r_b^3 \Big)
+#' $$
+#' @returns Returns the cumulative amount of volumetric
+#' infiltration occurs through the half sphere.
+#' @examples
+#'
+#' library(units)
+#' r_b <- set_units(2, "ft") # length
+#' theta_0 <- 0.2 # unitless
+#' theta_s <- 0.35 # unitless
+#' F_s <- set_units(c(1, 5, 10, 20), "ft^3") # units of length^2
+#' Ksat <- set_units(0.2, "cm/h") # length / time
+#' h_b <- set_units(6, "ft") # hydraulic head (length)
+#' h_0 <- set_units(-10, "cm") # hydraulic head (length)
+#' times <- get_greenampt_hsphere_time(theta_0, theta_s, F_s, Ksat, h_b, h_0, r_b)
+#' F_s_calculated <- get_greenampt_hsphere_numerical(theta_0, theta_s, times, Ksat, h_b, h_0, r_b)
+#' F_s_calculated
+get_greenampt_hsphere_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^3") {
+  units::units_options(set_units_mode = "standard")
+  units_check <- units::set_units(1, F_units)
+  units_check <- units::set_units(units_check, "m^3") # check to ensure units are L^3
+  F_s_cum <- get_greenampt_x_roots(times = times, x_units = F_units, green_ampt_function_name = "get_greenampt_hsphere_time",
+                                     theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0, r_b = r_b)
+
+  return(F_s_cum)
+}
 

@@ -35,6 +35,10 @@ get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...)
         time_root <- get_greenampt_time(Fcum = x, ...) - time
       } else if (green_ampt_function_name=="get_greenampt_horiz_time") {
         time_root <- get_greenampt_horiz_time(Fcum = x, ...) - time
+      } else if (green_ampt_function_name=="get_greenampt_cyl_horiz_time") {
+        time_root <- get_greenampt_cyl_horiz_time(F_c = x, ...) - time
+      } else if (green_ampt_function_name=="get_greenampt_hsphere_time") {
+        time_root <- get_greenampt_hsphere_time(F_s = x, ...) - time
       } else {
         stop("green_ampt_function_name does not match acceptable names")
       }
@@ -52,3 +56,5 @@ get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...)
   }
   return(x)
 }
+
+# get_greenampt_cyl_flow <-
