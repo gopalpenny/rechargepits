@@ -94,14 +94,14 @@ flow <- flow_horizontal + flow_vertical
 flow
 ```
 
-## Cylindrical pit with cylindrical horizontal flow and half-spherical bottom flow
+## Cylindrical pit with half-spherical bottom flow
 
 Here the pit is represented by a radius and a depth. Water flows radially outwards creating an expanding cylinder along the depth of the pit. At the bottom of the pit, water flows radially outward to create a downward half-sphere. Gravity (i.e., the elevation gradient) is fully ignored to make the math tractable. This may be a reasonable assumption if the pit is deep enough that the pressure head gradient is much greater than 1.
 
-We first model a simple cylindrical pit, 6 ft deep with a 2 ft radius in a homogeneous soil profile. This can be done simply as:
+<!-- We first model a simple cylindrical pit, 6 ft deep with a 2 ft radius in a homogeneous soil profile. This can be done simply as: -->
 
-```{r}
-
+```{r, out.width = "250 px", echo = FALSE}
+knitr::include_graphics("cylindrical-pit-spherical-bottom.jpg")
 ```
 
 
@@ -179,9 +179,12 @@ library(tidyr)
 library(dplyr)
 df <- as.data.frame(bind_cols(times_h = rep(times, 3), 
                           recharge_cu_ft = c(Fcum_clay_horiz,Fcum_sand_horiz, Fcum_sand_bottom), 
-                          component = rep(c("Clay horiz", "Sand horiz", "Sand bottom"), each = length(times))))
+                          layer = rep(c("Clay horiz", "Sand horiz", "Sand bottom"), each = length(times))))
+df$layer <- factor(df$layer, levels = c("Clay horiz", "Sand horiz", "Sand bottom"))
 
-ggplot(df) + geom_bar(aes(times_h, recharge_cu_ft, fill = component), stat = 'identity')
+ggplot(df) + 
+  geom_bar(aes(as.character(times_h), recharge_cu_ft, fill = layer), stat = 'identity') +
+  xlab("Time [h]") + ylab("Cumulative recharge")
 ```
 
 
