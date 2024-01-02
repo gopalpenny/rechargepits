@@ -12,12 +12,12 @@ times <- get_greenampt_cyl_horiz_time(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b
 F_c_calculated <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat, h_b, h_0, r_b, times)
 
 
-paste(round(times, 4), collapse = ", ")
-paste(round(F_c_calculated, 5), collapse = ", ")
+# paste(round(times, 4), collapse = ", ")
+# paste(round(F_c_calculated, 5), collapse = ", ")
 
 
 test_that("get_greenampt_cyl_horiz_time works", {
-  expect_equal(round(times, 4), set_units(c(0, 3e-04, 0.0063, 0.0248, 0.0956), "h"))
+  expect_equal(round(times, 4), set_units(c(0, 0.4367, 7.5107, 22.7765, 64.5078), "h"))
 })
 
 
@@ -35,12 +35,12 @@ h_b <- set_units(4, "ft") # hydraulic head (length)
 h_0 <- set_units(-10, "cm") # hydraulic head (length)
 d <- set_units(3, "ft")
 num_sections <- 3
-F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2", num_sections = 3, d = d)
+F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^3", num_sections = 3, d = d)
 
 # paste(round(F_v_cum, 5), collapse = ", ")
 
 test_that("get_greenampt_cyl_flow_integrated works", {
-  expect_equal(round(F_v_cum, 5), set_units(c(0, 92.47857, 133.63127, 324.4744), "ft^3"))
+  expect_equal(round(F_v_cum, 5), set_units(c(0, 2.08077, 3.0067, 7.30069), "ft^3"))
 })
 
 # # This is equivalent to a discretized version of `get_greenampt_cyl_horiz_numerical`:

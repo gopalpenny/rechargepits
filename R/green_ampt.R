@@ -284,7 +284,7 @@ get_greenampt_horiz_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0
 get_greenampt_cyl_horiz_time <- function(theta_0, theta_s, F_c, Ksat, h_b, h_0, r_b) {
   dVWC <- theta_s - theta_0
 
-  r_f <- sqrt(F_c * dVWC / pi + r_b^2)
+  r_f <- sqrt(F_c / dVWC / pi + r_b^2)
 
   t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + 2 * r_f^2 * as.numeric(log(r_f/r_b)) - r_f^2)
   # t <- dVWC / (4 * Ksat * (h_b - h_0)) * (r_b^2 + r_f^2 * (2 * as.numeric(log(r_f/r_b)) - 1))
