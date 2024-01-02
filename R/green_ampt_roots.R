@@ -23,6 +23,10 @@
 #'    theta_0 = theta_0, theta_s = theta_s, Ksat = Ksat, h_b = h_b, h_0 = h_0)
 get_greenampt_x_roots <- function(times, x_units, green_ampt_function_name, ...) {
 
+  if (any(times < set_units(0,'hr'))) {
+    stop("Cannot calculate roots for negative times.")
+  }
+
   units::units_options(set_units_mode = "standard")
 
   for (i in 1:length(times)) {

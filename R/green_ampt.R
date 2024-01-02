@@ -379,7 +379,7 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 #' d <- set_units(3, "ft")
 #' num_sections <- 3
 #' F_v_cum <- get_greenampt_cyl_flow_integrated(theta_0, theta_s, Ksat, h_b, h_0, r_b, times,
-#'                                              F_units = "ft^2", num_sections = 3, d = d)
+#'                                              F_units = "ft^3", num_sections = 3, d = d)
 #'
 #' # This is equivalent to a discretized version of `get_greenampt_cyl_horiz_numerical`:
 #' Fc_1_5 <- get_greenampt_cyl_horiz_numerical(theta_0, theta_s, Ksat,
@@ -391,7 +391,7 @@ get_greenampt_cyl_horiz_numerical <- function(theta_0, theta_s, Ksat, h_b, h_0, 
 #' Fc_sum <- d / num_sections * (Fc_1_5 + Fc_2_5 + Fc_3_5)
 #' F_v_cum
 #' Fc_sum
-get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^2", num_sections = 5, d = NULL) {
+get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, r_b, times, F_units = "ft^3", num_sections = 5, d = NULL) {
   if (is.null(d)) {
     d <- h_b
   }
@@ -418,6 +418,7 @@ get_greenampt_cyl_flow_integrated <- function(theta_0, theta_s, Ksat, h_b, h_0, 
       utils::setTxtProgressBar(pb, i)
     }
   }
+  F_v_cum <- units::set_units(F_v_cum, F_units)
   return(F_v_cum)
 }
 
