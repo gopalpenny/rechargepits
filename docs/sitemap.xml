@@ -10,13 +10,13 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/articles/green-ampt-derivations.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/recharge-models.html</loc>
-  </url>
-  <url>
-    <loc>/articles/recharge-pit-geometries.html</loc>
+    <loc>/articles/recharge-pit-models.html</loc>
   </url>
   <url>
     <loc>/authors.html</loc>
@@ -26,6 +26,15 @@
   </url>
   <url>
     <loc>/reference/get_bc_hydraulic_head.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_greenampt_cyl_flow_integrated.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_greenampt_cyl_horiz_numerical.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_greenampt_cyl_horiz_time.html</loc>
   </url>
   <url>
     <loc>/reference/get_greenampt_flow_numerical.html</loc>
@@ -38,6 +47,12 @@
   </url>
   <url>
     <loc>/reference/get_greenampt_horiz_time.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_greenampt_hsphere_numerical.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_greenampt_hsphere_time.html</loc>
   </url>
   <url>
     <loc>/reference/get_greenampt_time.html</loc>
@@ -56,6 +71,9 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pipe.html</loc>
   </url>
   <url>
     <loc>/reference/rawls_soils.html</loc>
