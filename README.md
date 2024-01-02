@@ -19,11 +19,7 @@ You can install the development version of rechargepits from
 devtools::install_github("gopalpenny/rechargepits")
 ```
 
-## Placeholder \[Example\]
+## Package website
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(rechargepits)
-## basic example code
-```
+For further information, see the package website on
+[github.io](https://gopalpenny.github.io/rechargepits/).
